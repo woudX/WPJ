@@ -1,7 +1,6 @@
 #ifndef _CPP_MAIN_
 #define _CPP_MAIN_
 
-#include "WPJSafePtr.h"
 #include "WPJGarbageCollection.h"
 #include "WPJObjectPoolManager.h"
 #include "WPJString.h"
@@ -13,20 +12,22 @@ USING_NS_WPJ;
 void PoolTesting();
 void GCTesting();
 
+void printtest(float a)
+{
+	WPJLOG("%f\n",a);
+}
+
 int main(void *argc, void **argv)
 {
 	_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF|_CRTDBG_ALLOC_MEM_DF);
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
-	
-	WPJObjectPoolManager *poolMgr = WPJObjectPoolManager::GetSharedInst();
-	poolMgr->CreateObjectPool<WPJObject>();
+	WPJAnime *anime = new WPJAnime();
 
-	/*WPJObject *obj = poolMgr->GetIdleObject<WPJObject>();
-	obj->Release();
-	poolMgr->GC(2000);
-	*/
-	delete poolMgr;
+	SEL_SCHEDULE a = schedule_selector(WPJAnime::ofTest);//schedule_selector();
+	(anime->*a)(3);
+	//sel(3);
+	
 	system("pause");
 	return 0;
 }

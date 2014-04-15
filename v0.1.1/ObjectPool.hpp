@@ -112,7 +112,7 @@ private:
 		while (increaseSize > 0)
 		{
 			T *object = new T(); ASSERT(object != NULL);
-			object->bInPool = true;
+			object->SetbInPool(true);
 
 			m_IdlePool.push_back(object);
 			--increaseSize;

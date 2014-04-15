@@ -10,11 +10,10 @@ class WPJObject : WPJCopying
 {
 private:
 	U_INT m_uReference;
-	
+	WPJ_PROPERTY(bool, m_bIsLive, bIsLive)
+	WPJ_PROPERTY(bool, m_bInPool, bInPool)
 
 public:
-	bool bIsLive;
-	bool bInPool;
 	int test_data;
 	WPJObject();
 	WPJObject(int val);
@@ -33,6 +32,12 @@ public:
 	static WPJObject *CreateNewObject(bool t_bInPool);
 };
 
+typedef void (WPJObject::*SEL_SCHEDULE)(float);
+
+#define schedule_selector(_SELECTOR) (SEL_SCHEDULE)(&_SELECTOR)
+
+
+
 class WPJAnime : public WPJObject
 {
 public:
@@ -41,6 +46,7 @@ public:
 	int animeData;
 	WPJAnime();
 	WPJAnime(int animeVal, int val);
+	void ofTest(float a);
 };
 
 NS_WPJ_END

@@ -5,8 +5,8 @@ USING_NS_WPJ;
 
 WPJObject::WPJObject()
 	:m_uReference(1)
-	,bIsLive(true)
-	,bInPool(false)
+	,m_bIsLive(true)
+	,m_bInPool(false)
 {
 
 }
@@ -14,10 +14,30 @@ WPJObject::WPJObject()
 WPJObject::WPJObject(int val)
 	:test_data(val)
 	,m_uReference(1)
-	,bIsLive(true)
-	,bInPool(false)
+	,m_bIsLive(true)
+	,m_bInPool(false)
 {
 
+}
+
+bool WPJObject::GetbIsLive()
+{
+	return m_bIsLive;
+}
+
+void WPJObject::SetbIsLive(bool var)
+{
+	m_bIsLive = var;
+}
+
+bool WPJObject::GetbInPool()
+{
+	return m_bInPool;
+}
+
+void WPJObject::SetbInPool(bool var)
+{
+	m_bInPool = var;
 }
 
 WPJObject* WPJObject::DupCopy()
@@ -41,7 +61,7 @@ void WPJObject::Retain()
 void WPJObject::Release()
 {
 	--m_uReference;
-	bIsLive = false;
+	m_bIsLive = false;
 }
 
 U_INT WPJObject::GetRefCount()
@@ -72,7 +92,7 @@ WPJObject *WPJObject::CreateNewObject()
 WPJObject *WPJObject::CreateNewObject(bool t_bInPool = false)
 {
 	WPJObject *object = new WPJObject();
-	object->bInPool = t_bInPool;
+	object->m_bInPool = t_bInPool;
 	WPJGC::GetSharedInst()->AddPtr(object);
 
 	return object;
@@ -101,4 +121,9 @@ WPJObject* WPJAnime::DupCopy()
 U_INT WPJAnime::GetSize()
 {
 	return sizeof(*this);
+}
+
+void WPJAnime::ofTest(float a)
+{
+	WPJLOG("%f\n",a);
 }

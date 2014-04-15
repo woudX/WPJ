@@ -45,7 +45,7 @@ void WPJGC::GC()
 			break;
 		}
 
-		if (!ptr_data(itor)->bIsLive)
+		if (!ptr_data(itor)->GetbIsLive())
 		{
 			WPJLOG("[%s] GC ... %u Bytes Complete!\n", __TIME__, ptr_data(itor)->GetSize());
 
@@ -70,7 +70,7 @@ void WPJGC::CheckMemoryLeak()
 
 	foreach_in_list_auto(WPJObject*, itor, m_GCList)
 	{
-		if (ptr_data(itor)->bInPool)
+		if (ptr_data(itor)->GetbInPool())
 			poolSize += ptr_data(itor)->GetSize();
 		else
 			leakSize += ptr_data(itor)->GetSize();

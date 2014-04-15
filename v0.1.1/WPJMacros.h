@@ -31,6 +31,11 @@
 //////////////////////////////////////////////////////////////////////////
 #define U_INT unsigned int
 
+#define U_INT_MAX 0xffffffff
+
+#define WPJRepeatForever U_INT_MAX - 1
+
+
 /// _DEBUGģʽ
 //////////////////////////////////////////////////////////////////////////
 #ifdef _DEBUG
@@ -67,7 +72,7 @@
 
 #define WPJ_PROPERTY_READONLY(varType,varName,funcName)\
 protected: varType varName;\
-public: virtual varType get##funcName();
+public: virtual varType Get##funcName();
 
 /** WPJ_PROPERTY is used to declare property
  we can use getter/setter to get/set the var
@@ -76,10 +81,10 @@ public: virtual varType get##funcName();
  @funcName: the name of getter/setter
 */
 
-#define WPJ_PROPERTY(varType,varName,fucnName)\
+#define WPJ_PROPERTY(varType,varName,funcName)\
 protected: varType varName;\
-public: virtual varType get##funcName();\
-public: virtual void set##funcName(varType var);
+public: virtual varType Get##funcName();\
+public: virtual void Set##funcName(varType var);
 
 #endif
 
