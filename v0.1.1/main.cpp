@@ -12,21 +12,29 @@ USING_NS_WPJ;
 void PoolTesting();
 void GCTesting();
 
-void printtest(float a)
-{
-	WPJLOG("%f\n",a);
-}
-
 int main(void *argc, void **argv)
 {
 	_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF|_CRTDBG_ALLOC_MEM_DF);
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
-	WPJAnime *anime = new WPJAnime();
+	
+	WPJObject *object = WPJObject::CreateNewObject();
+	
+	WPJObject *sharedObject = object;
+	object->GetSharedPtr(sharedObject);
+	
+	if (object == sharedObject)
+		WPJLOG("they are same\n");
+	else
+		WPJLOG("they are different\n");
+	
+	sharedObject->Release();
+	object->Release();
 
-	SEL_SCHEDULE a = schedule_selector(WPJAnime::ofTest);//schedule_selector();
-	(anime->*a)(3);
-	//sel(3);
+	WPJGC::GetSharedInst()->GC();
+
+	WPJGC::GetSharedInst()->CheckMemoryLeak();
+	delete WPJGC::GetSharedInst();
 	
 	system("pause");
 	return 0;
@@ -58,15 +66,26 @@ void PoolTesting()
 //////////////////////////////////////////////////////////////////////////
 void GCTesting()
 {
-	for (int i = 0; i < 10; ++i)
+	int count = 0;
+	while (1)
 	{
-		for (int j = 0; j < 100 - i * 10; ++j)
+		count++;
+		WPJObject *object = WPJObject::CreateNewObject();
+		object->Release();
+
+		if (count % 300000 == 0)
 		{
-			WPJObject *tObject = WPJObject::CreateNewObject();
-			tObject->Release();
+			count = 0;
+			WPJGC::GetSharedInst()->GC();
+			WPJLOG("----------回收暂停----------\n");
+			for (int i = 3; i > 0; --i)
+			{
+				WPJLOG("剩余时间：%d\n",i);
+				Sleep(1000);
+			}
+
 		}
-		WPJGC::GetSharedInst()->GC();
-		//Sleep(3000);
-	}	
+	}
+	delete WPJGC::GetSharedInst();
 }
 #endif

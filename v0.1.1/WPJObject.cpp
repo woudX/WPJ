@@ -61,10 +61,10 @@ void WPJObject::Retain()
 void WPJObject::Release()
 {
 	--m_uReference;
-	m_bIsLive = false;
+	//m_bIsLive = false;
 }
 
-U_INT WPJObject::GetRefCount()
+U_INT WPJObject::GetReference()
 {
 	return m_uReference;
 }
@@ -74,6 +74,12 @@ WPJObject *WPJObject::GetSharedPtr()
 	Retain();
 
 	return this;
+}
+
+void WPJObject::GetSharedPtr(WPJObject* &object)
+{
+	object = this;
+	object->Retain();
 }
 
 WPJObject *WPJObject::GetCopiedPtr()
@@ -98,6 +104,10 @@ WPJObject *WPJObject::CreateNewObject(bool t_bInPool = false)
 	return object;
 }
 
+void WPJObject::Update(float dt)
+{
+
+}
 
 WPJAnime::WPJAnime()
 {

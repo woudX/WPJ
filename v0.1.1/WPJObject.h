@@ -6,10 +6,10 @@
 
 NS_WPJ_BEGIN
 
-class WPJObject : WPJCopying
+class WPJObject : public WPJCopying
 {
 private:
-	U_INT m_uReference;
+	WPJ_PROPERTY_READONLY(U_INT,m_uReference,Reference)
 	WPJ_PROPERTY(bool, m_bIsLive, bIsLive)
 	WPJ_PROPERTY(bool, m_bInPool, bInPool)
 
@@ -21,15 +21,16 @@ public:
 	void Retain();
 	void Release();
 
-	U_INT GetRefCount();
-
 	WPJObject *GetSharedPtr();
+	void	  GetSharedPtr(WPJObject* &object);
 	WPJObject *GetCopiedPtr();
 	virtual WPJObject* DupCopy();
 	virtual U_INT GetSize();
 
 	static WPJObject *CreateNewObject();
 	static WPJObject *CreateNewObject(bool t_bInPool);
+
+	virtual void Update(float dt);
 };
 
 typedef void (WPJObject::*SEL_SCHEDULE)(float);

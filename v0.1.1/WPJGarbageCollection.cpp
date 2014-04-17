@@ -45,7 +45,7 @@ void WPJGC::GC()
 			break;
 		}
 
-		if (!ptr_data(itor)->GetbIsLive())
+		if (ptr_data(itor)->GetReference() == 0)
 		{
 			WPJLOG("[%s] GC ... %u Bytes Complete!\n", __TIME__, ptr_data(itor)->GetSize());
 

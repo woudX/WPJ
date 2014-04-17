@@ -50,7 +50,7 @@ public:
 		
 		foreach_in_list(WPJObject* , itor, m_UsedPool)
 		{
-			if (ptr_data(itor)->GetRefCount() == 1)
+			if (ptr_data(itor)->GetReference() == 1)
 			{
 				m_IdlePool.push_back(ptr_data(itor));
 				itor = m_UsedPool.erase(itor);

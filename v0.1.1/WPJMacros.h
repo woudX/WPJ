@@ -85,7 +85,14 @@ public: virtual varType Get##funcName();
 protected: varType varName;\
 public: virtual varType Get##funcName();\
 public: virtual void Set##funcName(varType var);
-
+/*
+#define FIND_TIMER_LIST(varType, list, varPtr, findPtr)\
+	std::list<WPJTimer*>
+	for (list<varType>::iterator itor = list.begin(); itor != list.end(); itor++)\
+	{\
+		if ((*itor)->target == varPtr)\
+		\
+	}*/
 #endif
 
 
