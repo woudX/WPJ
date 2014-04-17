@@ -12,7 +12,8 @@ _SchedulerTimers::_SchedulerTimers()
 
 _SchedulerTimers::~_SchedulerTimers()
 {
-	target->Release();
+	if (target != NULL)
+		target->Release();
 
 	foreach_in_list_auto(WPJTimer*, itor, timers)
 	{
@@ -30,6 +31,12 @@ _SchedulerUpdates::_SchedulerUpdates()
 ,markedForDeletion(false)
 {
 
+}
+
+_SchedulerUpdates::~_SchedulerUpdates()
+{
+	if (target != NULL)
+		target->Release();
 }
 
 WPJTimer::WPJTimer()
@@ -222,11 +229,6 @@ float WPJScheduler::GetTimeScale()
 	return m_fTimeScale;
 }
 
-void WPJScheduler::Update(float dt)
-{
-
-}
-
 void WPJScheduler::UnscheduleSelector(WPJObject *target, SEL_SCHEDULE pfnSelector)
 {
 	foreach_in_list_auto(_SchedulerTimers*, itor, m_lCustomedSchedulerTimer)
@@ -279,7 +281,7 @@ void WPJScheduler::CheckInsertUpdate(std::list<_SchedulerUpdates*> &updateList, 
 	{
 		_SchedulerUpdates *schedulerUpdate = new _SchedulerUpdates();	ASSERT(schedulerUpdate != NULL);
 		schedulerUpdate->paused = bPaused;
-		schedulerUpdate->target = target;
+		target->GetSharedPtr(schedulerUpdate->target);
 		schedulerUpdate->priority = nPriority;
 
 		updateList.push_back(schedulerUpdate);
@@ -298,7 +300,115 @@ void WPJScheduler::ScheduleUpdateForTarget(WPJObject *target, int nPriority, boo
 		CheckInsertUpdate(m_lUpdateNegList, target, nPriority, bPaused);
 }
 
+void WPJScheduler::CheckRemoveUpdate(std::list<_SchedulerUpdates*> &updateList,const WPJObject *target)
+{
+	foreach_in_list_auto(_SchedulerUpdates*, itor, updateList)
+	{
+		if ((*itor)->target == target)
+		{
+			(*itor)->markedForDeletion = true;
+			break;
+		}
+	}
+}
+
+_SchedulerUpdates *WPJScheduler::FindUpdateByTarget(const WPJObject *target)
+{
+	_SchedulerUpdates *t_pUpdate = NULL;
+	
+	find_in_list(_SchedulerUpdates*, t_pUpdate, target, m_lUpdate0List)
+	find_in_list(_SchedulerUpdates*, t_pUpdate, target, m_lUpdatePosList)
+	find_in_list(_SchedulerUpdates*, t_pUpdate, target, m_lUpdateNegList)
+
+	return t_pUpdate;
+}
+
 void WPJScheduler::UnscheduleUpdateForTarget(const WPJObject *target)
 {
+	_SchedulerUpdates *t_pUpdate = FindUpdateByTarget(target);
+	t_pUpdate->markedForDeletion = true;
+}
 
+void WPJScheduler::PauseTarget(WPJObject *target)
+{
+	_SchedulerUpdates *t_pUpdate = FindUpdateByTarget(target);
+	t_pUpdate->paused = true;
+}
+
+void WPJScheduler::ResumeTarget(WPJObject *target)
+{
+	_SchedulerUpdates *t_pUpdate = FindUpdateByTarget(target);
+	t_pUpdate->paused = false;
+}
+
+void WPJScheduler::Update(float dt)
+{
+	// call normal update
+	// priority > 0
+	foreach_in_list_auto(_SchedulerUpdates*, itor, m_lUpdatePosList)
+	{
+		if (!((*itor)->markedForDeletion) && !((*itor)->paused))
+			(*itor)->target->Update(dt);
+	}
+
+	// priority = 0
+	foreach_in_list_auto(_SchedulerUpdates*, itor, m_lUpdate0List)
+	{
+		if (!((*itor)->markedForDeletion) && !((*itor)->paused))
+			(*itor)->target->Update(dt);
+	}
+
+	// priority < 0
+	foreach_in_list_auto(_SchedulerUpdates*, itor, m_lUpdateNegList)
+	{
+		if (!((*itor)->markedForDeletion) && !((*itor)->paused))
+			(*itor)->target->Update(dt);
+	}
+
+	// customed call
+	foreach_in_list_auto(_SchedulerTimers*, itor, m_lCustomedSchedulerTimer)
+	{
+		if (!(*itor)->paused)
+		foreach_in_list_auto(WPJTimer*, t_itor, (*itor)->timers)
+		{
+			(*t_itor)->Update(dt);
+		}
+	}
+
+	// recycle update, customed timers will be recycled auto
+	foreach_in_list(_SchedulerUpdates*, itor, m_lUpdatePosList)
+	{
+		if ((*itor)->markedForDeletion)
+		{
+			delete (*itor);
+			(*itor) = NULL;
+			itor = m_lUpdatePosList.erase(itor);
+		}
+		else
+			++itor;
+	}
+
+	foreach_in_list(_SchedulerUpdates*, itor, m_lUpdate0List)
+	{
+		if ((*itor)->markedForDeletion)
+		{
+			delete (*itor);
+			(*itor) = NULL;
+			itor = m_lUpdate0List.erase(itor);
+		}
+		else
+			++itor;
+	}
+
+	foreach_in_list(_SchedulerUpdates*, itor, m_lUpdateNegList)
+	{
+		if ((*itor)->markedForDeletion)
+		{
+			delete (*itor);
+			(*itor) = NULL;
+			itor = m_lUpdateNegList.erase(itor);
+		}
+		else
+			++itor;
+	}
 }

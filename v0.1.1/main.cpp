@@ -4,6 +4,7 @@
 #include "WPJGarbageCollection.h"
 #include "WPJObjectPoolManager.h"
 #include "WPJString.h"
+#include "WPJScheduler.h"
 
 #include <windows.h>
 
@@ -18,23 +19,15 @@ int main(void *argc, void **argv)
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
 	
-	WPJObject *object = WPJObject::CreateNewObject();
-	
-	WPJObject *sharedObject = object;
-	object->GetSharedPtr(sharedObject);
-	
-	if (object == sharedObject)
-		WPJLOG("they are same\n");
-	else
-		WPJLOG("they are different\n");
-	
-	sharedObject->Release();
-	object->Release();
+	WPJObject *obj = new WPJObject();
+	WPJScheduler *schedule = new WPJScheduler();
+	schedule->ScheduleUpdateForTarget(obj, 3, false);
 
-	WPJGC::GetSharedInst()->GC();
-
-	WPJGC::GetSharedInst()->CheckMemoryLeak();
-	delete WPJGC::GetSharedInst();
+	while (1)
+	{
+		schedule->Update(1);
+		Sleep(1000);
+	}
 	
 	system("pause");
 	return 0;

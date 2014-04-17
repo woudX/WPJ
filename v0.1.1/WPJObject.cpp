@@ -106,7 +106,7 @@ WPJObject *WPJObject::CreateNewObject(bool t_bInPool = false)
 
 void WPJObject::Update(float dt)
 {
-
+	WPJLOG("WPJObject update once!\n");
 }
 
 WPJAnime::WPJAnime()

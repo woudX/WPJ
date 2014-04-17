@@ -91,8 +91,20 @@ private:
 
 	WPJScheduler();
 
+	_SchedulerUpdates *FindUpdateByTarget(const WPJObject *target);
 	void CheckInsertUpdate(std::list<_SchedulerUpdates*> &updateList, WPJObject *target, int nPriority, bool bPaused);
+	void CheckRemoveUpdate(std::list<_SchedulerUpdates*> &updateList, const WPJObject *target);
 };
+
+#define find_in_list(type, findPtr, targetPtr, list)\
+foreach_in_list_auto(type, itor, list)\
+{\
+	if ((*itor)->target == targetPtr)\
+	{\
+		findPtr = (*itor);\
+		break;\
+	}\
+}
 
 NS_WPJ_END
 
