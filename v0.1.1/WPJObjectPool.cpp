@@ -7,14 +7,9 @@ void WPJObjectPool::GC(int maxcount)
 
 }
 
-WPJString *WPJObjectPool::PoolType()
+HString *WPJObjectPool::PoolType()
 {
 	return m_poolType;
-}
-
-void WPJObjectPool::ReleasePool()
-{
-	delete m_poolType;
 }
 
 WPJObjectPool::~WPJObjectPool()

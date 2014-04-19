@@ -19,7 +19,7 @@ public:
 
 		objectPool->SetPoolSize(maxSize);
 		objectPool->Allocate();
-		objectPool->m_poolType = new WPJString(typeid(T).name());
+		objectPool->m_poolType = new HString(typeid(T).name());
 
 		return objectPool;
 	}
@@ -38,7 +38,8 @@ public:
 				m_UsedPool.push_back(ptr);
 
 				// ¹²ÏíÖ¸Õë
-				T *sharedPtr = ptr->GetSharedPtr();
+				T *sharedPtr;
+				ptr->GetSharedPtr(sharedPtr);
 				return sharedPtr;
 			}
 		}
@@ -64,7 +65,7 @@ public:
 		WPJLOG("[%s] Object Pool ... Complete!\n", __TIMESTAMP__);
 	}
 
-	void ReleasePool()
+	virtual ~ObjectPool()
 	{
 		foreach_in_list(WPJObject* , itor, m_UsedPool)
 		{
@@ -81,12 +82,6 @@ public:
 			itor = m_IdlePool.erase(itor);
 		}
 		m_IdlePool.clear();
-
-	}
-
-	~ObjectPool()
-	{
-		ReleasePool();
 	}
 
 protected:

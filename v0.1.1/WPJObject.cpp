@@ -11,15 +11,6 @@ WPJObject::WPJObject()
 
 }
 
-WPJObject::WPJObject(int val)
-	:test_data(val)
-	,m_uReference(1)
-	,m_bIsLive(true)
-	,m_bInPool(false)
-{
-
-}
-
 bool WPJObject::GetbIsLive()
 {
 	return m_bIsLive;
@@ -43,7 +34,6 @@ void WPJObject::SetbInPool(bool var)
 WPJObject* WPJObject::DupCopy()
 {
 	WPJObject* newObj = new WPJObject();
-	newObj->test_data = test_data;
 
 	return newObj;
 }
@@ -67,13 +57,6 @@ void WPJObject::Release()
 U_INT WPJObject::GetReference()
 {
 	return m_uReference;
-}
-
-WPJObject *WPJObject::GetSharedPtr()
-{
-	Retain();
-
-	return this;
 }
 
 void WPJObject::GetSharedPtr(WPJObject* &object)
@@ -109,21 +92,33 @@ void WPJObject::Update(float dt)
 	WPJLOG("WPJObject update once!\n");
 }
 
+WPJObject::~WPJObject()
+{
+
+}
+
 WPJAnime::WPJAnime()
 {
 
 }
 
-WPJAnime::WPJAnime(int animeVal, int val):WPJObject(val),animeData(animeVal)
+WPJAnime::WPJAnime(int animeVal):animeData(animeVal)
 {
 
+}
+
+WPJAnime *WPJAnime::CreateNewObject()
+{
+	WPJAnime *t_pAnime = new WPJAnime();
+	WPJGC::GetSharedInst()->AddPtr(t_pAnime);
+
+	return t_pAnime;
 }
 
 WPJObject* WPJAnime::DupCopy()
 {
 	WPJAnime *newAnime = new WPJAnime();
 	newAnime->animeData = animeData;
-	newAnime->test_data = test_data;
 
 	return newAnime;
 }

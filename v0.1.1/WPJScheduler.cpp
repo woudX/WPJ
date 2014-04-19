@@ -152,6 +152,7 @@ void WPJTimer::Update(float dt)
 	if (!m_bRunForever && m_uTimesExecuted > m_uRepeat)
 	{
 		// To-Do: 注销Timer，允许GC回收
+		// 由Singleton WPJDirector获取到Scheduler然后传入target和pfnSelector注销Timer
 	}
 }
 
@@ -159,6 +160,18 @@ WPJScheduler::WPJScheduler()
 :m_fTimeScale(1.0f)
 {
 
+}
+
+U_INT WPJScheduler::GetSize()
+{
+	return sizeof(this);
+}
+
+WPJScheduler *WPJScheduler::CreateNewObject()
+{
+	WPJScheduler *scheduler = new WPJScheduler();
+	WPJGC::GetSharedInst()->AddPtr(scheduler);
+	return scheduler;
 }
 
 void WPJScheduler::ScheduleSelector(WPJObject *target, SEL_SCHEDULE pfnSelector, float fInterval, bool bPaused)
@@ -214,6 +227,7 @@ void WPJScheduler::ScheduleSelector(WPJObject *target, SEL_SCHEDULE pfnSelector,
 
 		// insert into m_lCustomedSchedulerTimer
 		schedulerTimers->timers.push_back(timer);
+		m_lCustomedSchedulerTimer.push_back(schedulerTimers);
 	}
 
 }
@@ -234,7 +248,7 @@ void WPJScheduler::UnscheduleSelector(WPJObject *target, SEL_SCHEDULE pfnSelecto
 	foreach_in_list_auto(_SchedulerTimers*, itor, m_lCustomedSchedulerTimer)
 	{
 		if ((*itor)->target == target)
-			foreach_in_list_auto(WPJTimer*, t_itor, (*itor)->timers)
+			foreach_in_list(WPJTimer*, t_itor, (*itor)->timers)
 			{
 				if ((*t_itor)->GetpfnSelector() == pfnSelector)
 				{
@@ -243,6 +257,8 @@ void WPJScheduler::UnscheduleSelector(WPJObject *target, SEL_SCHEDULE pfnSelecto
 					(*t_itor) = NULL;
 					t_itor = (*itor)->timers.erase(t_itor);
 				}
+				else
+					++t_itor;
 			}
 	}
 }
@@ -261,6 +277,14 @@ void WPJScheduler::UnscheduleAllSelector(WPJObject *target)
 
 		(*itor)->timers.clear();
 	}
+}
+
+void WPJScheduler::UnscheduleAll()
+{
+	safe_remove_all_from_list(_SchedulerUpdates*, m_lUpdate0List);
+	safe_remove_all_from_list(_SchedulerUpdates*, m_lUpdatePosList);
+	safe_remove_all_from_list(_SchedulerUpdates*, m_lUpdateNegList);
+	safe_remove_all_from_list(_SchedulerTimers*, m_lCustomedSchedulerTimer);
 }
 
 void WPJScheduler::CheckInsertUpdate(std::list<_SchedulerUpdates*> &updateList, WPJObject *target, int nPriority, bool bPaused)
@@ -341,6 +365,12 @@ void WPJScheduler::ResumeTarget(WPJObject *target)
 	t_pUpdate->paused = false;
 }
 
+bool WPJScheduler::IsTargetPaused(WPJObject *target)
+{
+	_SchedulerUpdates *t_pUpdate = FindUpdateByTarget(target);
+	return t_pUpdate->paused;
+}
+
 void WPJScheduler::Update(float dt)
 {
 	// call normal update
@@ -411,4 +441,12 @@ void WPJScheduler::Update(float dt)
 		else
 			++itor;
 	}
+}
+
+WPJScheduler::~WPJScheduler()
+{
+	safe_remove_all_from_list(_SchedulerUpdates*, m_lUpdate0List);
+	safe_remove_all_from_list(_SchedulerUpdates*, m_lUpdatePosList);
+	safe_remove_all_from_list(_SchedulerUpdates*, m_lUpdateNegList);
+	safe_remove_all_from_list(_SchedulerTimers*, m_lCustomedSchedulerTimer);
 }

@@ -7,6 +7,11 @@
 
 NS_WPJ_BEGIN
 
+/**
+	WPJTimer provide the basic timing function, it can realize delay, repeat 
+	and interval run
+*/
+
 class WPJTimer : public WPJObject
 {
 public:
@@ -34,8 +39,7 @@ protected:
 };
 
 /**
- _SchedulerTimers is a inner-class
- It contain the information about registed WPJObject-WPJTimer and only used for manage all customed Scheduler
+	_SchledulerTimer is a non-public class, it contains WPJObject and Timers has been registed
 */
 class _SchedulerTimers
 {
@@ -48,6 +52,10 @@ public:
 	~_SchedulerTimers();
 };
 
+/**
+	_SchedulerUpdates is a non-public class, it contains WPJObject which the Update function 
+	has been registed
+*/
 class _SchedulerUpdates
 {
 public:
@@ -60,11 +68,18 @@ public:
 	~_SchedulerUpdates();
 };
 
+/**
+	WPJScheduler is used to maintain all schedulers in project, it provide many methods 
+	to operate the normal scheduler and customed scheduler
+*/
+
 class WPJScheduler : public WPJObject
 {
 public:
 	void Update(float dt);
+
 	static WPJScheduler *CreateNewObject();
+	virtual U_INT GetSize();
 
 	void ScheduleSelector(WPJObject *target, SEL_SCHEDULE pfnSelector, float fInterval, bool bPaused);
 	void ScheduleSelector(WPJObject *target, SEL_SCHEDULE pfnSelector, float fInterval, U_INT nRepeat, float fDelay, bool bPaused);
@@ -80,7 +95,8 @@ public:
 	void ResumeTarget(WPJObject *target);
 	bool IsTargetPaused(WPJObject *target);
 
-	
+	~WPJScheduler();
+
 private:
 	WPJ_PROPERTY(float, m_fTimeScale, TimeScale)
 		

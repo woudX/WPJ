@@ -6,47 +6,58 @@
 
 NS_WPJ_BEGIN
 
+/**
+	WPJObject Class is the root of inherit tree in this project, it define
+	many methods and variables to provide basic support for the derived class
+*/
+
 class WPJObject : public WPJCopying
 {
 private:
+
+	// the count of reference
 	WPJ_PROPERTY_READONLY(U_INT,m_uReference,Reference)
+
+	// if alive
 	WPJ_PROPERTY(bool, m_bIsLive, bIsLive)
+
+	// if in Object Pool
 	WPJ_PROPERTY(bool, m_bInPool, bInPool)
 
 public:
-	int test_data;
 	WPJObject();
-	WPJObject(int val);
 
 	void Retain();
 	void Release();
 
-	WPJObject *GetSharedPtr();
-	void	  GetSharedPtr(WPJObject* &object);
-	WPJObject *GetCopiedPtr();
-	virtual WPJObject* DupCopy();
-	virtual U_INT GetSize();
-
 	static WPJObject *CreateNewObject();
 	static WPJObject *CreateNewObject(bool t_bInPool);
 
+	virtual void GetSharedPtr(WPJObject* &object);
+	virtual WPJObject *GetCopiedPtr();
+	virtual WPJObject* DupCopy();
+	virtual U_INT GetSize();
+
 	virtual void Update(float dt);
+	virtual ~WPJObject();
 };
 
 typedef void (WPJObject::*SEL_SCHEDULE)(float);
 
 #define schedule_selector(_SELECTOR) (SEL_SCHEDULE)(&_SELECTOR)
 
-
-
 class WPJAnime : public WPJObject
 {
 public:
+	WPJAnime();
+	WPJAnime(int animeVal);
+
+	static WPJAnime *CreateNewObject();
+
 	WPJObject *DupCopy();
 	virtual U_INT GetSize();
 	int animeData;
-	WPJAnime();
-	WPJAnime(int animeVal, int val);
+	
 	void ofTest(float a);
 };
 

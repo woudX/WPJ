@@ -19,21 +19,59 @@ int main(void *argc, void **argv)
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
 	
-	WPJObject *obj = new WPJObject();
-	WPJScheduler *schedule = new WPJScheduler();
-	schedule->ScheduleUpdateForTarget(obj, 3, false);
+	WPJObjectPoolManager::GetSharedInst()->CreateObjectPool<WPJObject>();
+	WPJObject *obj = WPJObjectPoolManager::GetSharedInst()->GetIdleObject<WPJObject>();
+	obj->Release();
 
-	while (1)
-	{
-		schedule->Update(1);
-		Sleep(1000);
-	}
-	
+	WPJGC::GetSharedInst()->GC();
+	delete WPJObjectPoolManager::GetSharedInst();
+	delete WPJGC::GetSharedInst();
+
+
 	system("pause");
+
 	return 0;
 }
 
-/// 对象池测试
+/// SchedulerTesting
+//////////////////////////////////////////////////////////////////////////
+void SchedulerTesting()
+{
+	WPJObject *obj = WPJObject::CreateNewObject();
+	WPJAnime *anime = WPJAnime::CreateNewObject();
+	WPJScheduler *schedule = WPJScheduler::CreateNewObject();
+	schedule->ScheduleUpdateForTarget(obj, 3, false);
+	schedule->ScheduleSelector(anime, schedule_selector(WPJAnime::ofTest), 3, false);
+	schedule->ScheduleSelector(anime, schedule_selector(WPJAnime::ofTest), 5, 10, 0, false);
+
+	int count = 20;
+	while (count > 0)
+	{
+		schedule->Update(1);
+		Sleep(1000);
+		--count;
+
+		if (count == 12)
+			schedule->UnscheduleAllSelector(anime);
+
+		if (count == 10)
+			schedule->PauseTarget(obj);
+
+		if (count == 5)
+			schedule->ResumeTarget(obj);
+
+		WPJLOG("Time Limit ... %d\n", count);
+	}
+
+
+	anime->Release();
+	obj->Release();
+	schedule->Release();
+	WPJGC::GetSharedInst()->GC();
+	delete WPJGC::GetSharedInst();
+}
+
+/// PoolTesting
 //////////////////////////////////////////////////////////////////////////
 void PoolTesting()
 {
@@ -55,7 +93,7 @@ void PoolTesting()
 	delete pool;
 }
 
-/// 测试自动回收
+/// GCTesting
 //////////////////////////////////////////////////////////////////////////
 void GCTesting()
 {

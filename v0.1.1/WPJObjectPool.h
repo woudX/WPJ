@@ -11,11 +11,10 @@ class WPJObjectPool : public WPJObject
 {
 public:
 	virtual void GC(int maxcount);
-	WPJString *PoolType();
-	virtual void ReleasePool();
-	~WPJObjectPool();
+	HString *PoolType();
+	virtual ~WPJObjectPool();
 protected:
-	WPJString *m_poolType;
+	HString *m_poolType;
 };
 
 NS_WPJ_END

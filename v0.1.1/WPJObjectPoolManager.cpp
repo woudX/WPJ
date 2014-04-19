@@ -31,7 +31,6 @@ WPJObjectPoolManager::~WPJObjectPoolManager()
 	{
 		if (ptr_data(itor) != NULL)
 		{
-			ptr_data(itor)->ReleasePool();
 			ptr_del(ptr_data(itor));
 			itor = m_pools.erase(itor);
 		}

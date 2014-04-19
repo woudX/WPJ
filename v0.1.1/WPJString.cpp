@@ -2,29 +2,38 @@
 
 USING_NS_WPJ
 
-WPJString::WPJString():str(""),hashCode(0)
+HString::HString():str(""),hashCode(0)
 {
-
+	
 }
 
-WPJString::WPJString(std::string orgi)
+HString::HString(std::string orgi)
 {
 	str = orgi;
 	hashCode = Hash(orgi);
 }
 
-WPJString::WPJString(const WPJString const *orgi)
+HString::HString(HString const *orgi)
 {
 	str = orgi->str;
 	hashCode = orgi->hashCode;
 }
 
-bool WPJString::EqualWith(const WPJString const *rhs)
+bool HString::EqualWith(HString const *rhs)
 {
 	return hashCode == rhs->hashCode;
 }
 
-U_INT WPJString::Hash(std::string _str)
+U_INT HString::Hash(std::string _str)
 {
-	return 0;
+	// Times33 Algorithm
+	U_INT t_uHashCode = 0;
+	int t_iLength = _str.length();
+
+	for (int idx = 0; idx < t_iLength; ++idx)
+	{
+		t_uHashCode = t_uHashCode * 33 + _str[idx];
+	}
+
+	return t_uHashCode;
 }

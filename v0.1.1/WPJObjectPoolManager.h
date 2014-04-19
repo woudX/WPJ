@@ -30,7 +30,7 @@ public:
 		T *ptr = NULL;
 		foreach_in_list_auto(WPJObjectPool*, itor, m_pools)
 		{
-			WPJString type(typeid(T).name());
+			HString type(typeid(T).name());
 
 			if (ptr_data(itor)->PoolType()->EqualWith(&type))
 			{

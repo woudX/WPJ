@@ -27,6 +27,20 @@
 	for (list_iterator(className) itor = container.begin();\
 	itor != container.end();)
 
+#define safe_remove_all_from_list(className, container)\
+	foreach_in_list(className, itor, container)\
+	{\
+		if ((*itor) != NULL)\
+		{\
+			delete (*itor);\
+			(*itor) = NULL;\
+			itor = container.erase(itor);\
+		}\
+		else\
+			++itor;\
+	}\
+	container.clear();
+
 /// 数据结构宏定义
 //////////////////////////////////////////////////////////////////////////
 #define U_INT unsigned int
