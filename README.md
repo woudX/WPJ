@@ -6,7 +6,7 @@ This is a project about Game Engine, developed by C++
   I love to play STG games, for example touhou series~ Thus I plan to develop a game engine so I can use this to make STG games 
 by myself. And this engine can not only make STG, but also make other games, rpg, avg ... 
 
-  Now this project is developing now,so far I realize below function points:
+  Now this project is under developing ,so far I have realized these function points:
   
   + Memory
     * Auto Garbage Collection
