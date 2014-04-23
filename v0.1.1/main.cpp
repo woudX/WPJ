@@ -18,15 +18,20 @@ int main(void *argc, void **argv)
 	_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF|_CRTDBG_ALLOC_MEM_DF);
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
-	
-	WPJObjectPoolManager::GetSharedInst()->CreateObjectPool<WPJObject>();
-	WPJObject *obj = WPJObjectPoolManager::GetSharedInst()->GetIdleObject<WPJObject>();
-	obj->Release();
+
+	WPJObject *object = WPJObject::CreateNewObject();
+	WPJObject *sharedObj = NULL;
+
+	object->GetSharedPtr(sharedObj);
+	sharedObj->Release();
+
+	if (sharedObj == object)
+		WPJLOG("They are same!\n");
+
+	object->Release();
 
 	WPJGC::GetSharedInst()->GC();
-	delete WPJObjectPoolManager::GetSharedInst();
 	delete WPJGC::GetSharedInst();
-
 
 	system("pause");
 

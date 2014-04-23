@@ -76,10 +76,14 @@ public:
 class WPJScheduler : public WPJObject
 {
 public:
-	void Update(float dt);
 
+	/// Inherate Method
 	static WPJScheduler *CreateNewObject();
 	virtual U_INT GetSize();
+	virtual void GetSharedPtr(WPJScheduler* &object);
+	virtual WPJScheduler *GetCopiedPtr();
+
+	void Update(float dt);
 
 	void ScheduleSelector(WPJObject *target, SEL_SCHEDULE pfnSelector, float fInterval, bool bPaused);
 	void ScheduleSelector(WPJObject *target, SEL_SCHEDULE pfnSelector, float fInterval, U_INT nRepeat, float fDelay, bool bPaused);
