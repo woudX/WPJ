@@ -5,6 +5,7 @@
 #include "WPJObjectPoolManager.h"
 #include "WPJString.h"
 #include "WPJScheduler.h"
+#include "WPJTest.h"
 
 #include <windows.h>
 
@@ -19,23 +20,42 @@ int main(void *argc, void **argv)
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
 
-	WPJObject *object = WPJObject::CreateNewObject();
-	WPJObject *sharedObj = NULL;
+	WPJNode *pNode = WPJNodeTest::CreateNewObject();
+	WPJScheduler *pSchedule = WPJScheduler::CreateNewObject();
+	pNode->SetScheduler(pSchedule);
+	pNode->ScheduleUpdate();
+	pNode->Schedule(schedule_selector(WPJNodeTest::TestFuncA), 3);
+	pNode->Schedule(schedule_selector(WPJNodeTest::TestFuncB), 2, 5, 4);
+	int i = 0;
+	while (i++ < 20)
+	{
+		WPJLOG("--- Frame %d Start ----- %s -----\n", i, __TIMESTAMP__);
+		pSchedule->Update(1);
+		WPJLOG("--- Frame %d End   ----- %s -----\n>>>\n", i, __TIMESTAMP__);
 
-	object->GetSharedPtr(sharedObj);
-	sharedObj->Release();
+		if (i == 12)
+			pNode->UnscheduleUpdate();
 
-	if (sharedObj == object)
-		WPJLOG("They are same!\n");
+		if (i == 15)
+			pNode->Unschedule(schedule_selector(WPJNodeTest::TestFuncB));
 
-	object->Release();
+		Sleep(1000);
+	}
 
+	pSchedule->Release();
 	WPJGC::GetSharedInst()->GC();
+
 	delete WPJGC::GetSharedInst();
-
 	system("pause");
-
 	return 0;
+}
+
+
+/// WPJNodeTesting
+//////////////////////////////////////////////////////////////////////////
+void WPJNodeTesting()
+{
+
 }
 
 /// SchedulerTesting

@@ -34,7 +34,7 @@ class WPJNode : public WPJObject
 public:
 
 	/// Factory Method
-	WPJNode *CreateNewObject();
+	static WPJNode *CreateNewObject();
 
 	/// Inherited Method
 	virtual void GetSharedPtr(WPJNode* &object);
@@ -51,20 +51,39 @@ public:
 	 *	- Remove series (When remove occured, all actions and schedules should be cleanup)
 	 */
 
-
+	// Add a child
 	virtual void AddChild(WPJNode *p_pChild);
+
+	// Add a child with zOrder
 	virtual void AddChild(WPJNode *p_pChild, int p_izOrder);
+
+	// Add a child with zOrder and Tag
 	virtual void AddChild(WPJNode *p_pChild, int p_izOrder, int p_iTag);
 
+	// Get child by it's tag
 	virtual WPJNode *GetChildByTag(int p_iTag);
+
+	// Get a reference of childList
 	virtual std::list<WPJNode* >& GetAllChild();
+
+	// Get child count
 	virtual U_INT GetChildCount();
 
-	virtual void RemoveChild(WPJNode *p_pChild, bool p_bCleanup);
-	virtual void RemoveFromParent();
-	virtual void RemoveFromParentAndCleanup();
-	virtual void RemoveChildByTag(int p_iTag, bool p_bCleanup);
-	virtual void RemoveAllChild(bool p_bcleanup);
+	// Remove a child (Cleanup is default to True)
+	// If not cleanup, child's schedules and actions won't be released
+	virtual void RemoveChild(WPJNode *p_pChild, bool p_bCleanup = true);
+
+	// Remove this node from parent (Cleanup is default to True)
+	// If not cleanup, child's schedules and actions won't be released
+	virtual void RemoveFromParent(bool p_bCleanUp = true);
+
+	// Remove a child by tag (Cleanup is default to True)
+	// If not cleanup, child's schedules and actions won't be released
+	virtual void RemoveChildByTag(int p_iTag, bool p_bCleanup = true);
+
+	// Remove all child (Cleanup is default to True)
+	// If not cleanup, child's schedules and actions won't be released
+	virtual void RemoveAllChild(bool p_bCleanup = true);
 	
 	/// Scheduler And Timer
 	/**
@@ -75,15 +94,38 @@ public:
 	 */
 
 	bool IsScheduled(SEL_SCHEDULE pfnSelector);
+
+	// Schedule a SEL_SCHEDULE and will be called every frame
+	// Recommend to use Update if these code need to be called every frame
 	void Schedule(SEL_SCHEDULE pfnSelector);
+
+	// Schedule a SEL_SCHEDULE and will be called every 'interval' frame
 	void Schedule(SEL_SCHEDULE pfnSelector, float fInterval);
+
+	// Schedule a SEL_SCHEDULE, after a delay it will be called every 'interval' frame, total nRepeat
 	void Schedule(SEL_SCHEDULE pfnSelector, float fInterval, U_INT nRepeat, float fDelay);
+
+	// Schedule a SEL_SCHEDULE, after a delay it will be called only once
 	void ScheduleOnce(SEL_SCHEDULE pfnSelector, float fDelay);
 
-	void Unschedule(SEL_SCHEDULE);
+	// Schedule Update with prority, if called with no paras, the proprity is default to 0
+	// After using this method, Update method will be called every frame automatically
+	void ScheduleUpdate(int prority = 0);
+
+	// Unschedule Update
+	// Call if you don't want Update to be called automatically
+	void UnscheduleUpdate();
+
+	// Unschedule a SEL_SCHEDULE in WPJNode
+	void Unschedule(SEL_SCHEDULE pfnSelector);
+
+	// Unschedule all this node's selectors which has already scheduled in m_pSchedule
 	void UnscheduleAllSelectors();
 	
+	// Stop all schedules and actions about this node
 	void StopScheduleAndAction();
+
+	// Resume all schedules and actions about this node
 	void ResumeScheduleAndAction();
 	
 	/// Update

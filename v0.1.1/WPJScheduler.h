@@ -82,6 +82,7 @@ public:
 	virtual U_INT GetSize();
 	virtual void GetSharedPtr(WPJScheduler* &object);
 	virtual WPJScheduler *GetCopiedPtr();
+	virtual WPJScheduler *DupCopy();
 
 	void Update(float dt);
 

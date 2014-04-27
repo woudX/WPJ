@@ -137,7 +137,7 @@ void WPJTimer::Update(float dt)
 			}
 			else
 			{
-				if (m_fElapsed > m_fInterval)
+				if (m_fElapsed >= m_fInterval)
 				{
 					if (m_pTarget && m_pfnSelector)
 						(m_pTarget->*m_pfnSelector)(m_fElapsed);
@@ -160,6 +160,22 @@ WPJScheduler::WPJScheduler()
 :m_fTimeScale(1.0f)
 {
 
+}
+
+void WPJScheduler::GetSharedPtr(WPJScheduler* &object)
+{
+	object = this;
+	object->Retain();
+}
+
+WPJScheduler *WPJScheduler::GetCopiedPtr()
+{
+	return DupCopy();
+}
+
+WPJScheduler *WPJScheduler::DupCopy()
+{
+	return NULL;
 }
 
 U_INT WPJScheduler::GetSize()
