@@ -39,6 +39,11 @@ U_INT WPJNode::GetSize()
 	return sizeof(this);
 }
 
+bool WPJNode::Init()
+{
+	return true;
+}
+
 void WPJNode::SetParent(WPJNode* var)
 {
 	var->GetSharedPtr(m_pParent);
@@ -57,6 +62,58 @@ void WPJNode::SetScheduler(WPJScheduler* var)
 WPJScheduler *WPJNode::GetScheduler()
 {
 	return m_pScheduler;
+}
+
+float WPJNode::GetRotationX()
+{
+	return m_fRotationX;
+}
+
+void WPJNode::SetRotationX(float var)
+{
+	m_fRotationX = var;
+}
+
+float WPJNode::GetRotationY()
+{
+	return m_fRotationY;
+}
+
+void WPJNode::SetRotationY(float var)
+{
+	m_fRotationY = var;
+}
+
+void WPJNode::SetRotation(float fx, float fy)
+{
+	m_fRotationX = fx;
+	m_fRotationY = fy;
+}
+
+float WPJNode::GetScaleX()
+{
+	return m_fScaleX;
+}
+
+void WPJNode::SetScaleX(float var)
+{
+	m_fScaleX = var;
+}
+
+float WPJNode::GetScaleY()
+{
+	return m_fScaleY;
+}
+
+void WPJNode::SetScaleY(float var)
+{
+	m_fScaleY = var;
+}
+
+void WPJNode::SetScale(float fx, float fy)
+{
+	m_fScaleX = fx;
+	m_fScaleY = fy;
 }
 
 void WPJNode::AddChild(WPJNode *p_pChild)
@@ -253,9 +310,3 @@ WPJNode::~WPJNode()
 {
 
 }
-
-
-
-
-
-

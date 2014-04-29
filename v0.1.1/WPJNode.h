@@ -33,14 +33,20 @@ class WPJNode : public WPJObject
 {
 public:
 
-	/// Factory Method
+	/// Constructor and Distructor
 	static WPJNode *CreateNewObject();
+	virtual bool Init();
+	~WPJNode();
 
 	/// Inherited Method
 	virtual void GetSharedPtr(WPJNode* &object);
 	virtual WPJNode *GetCopiedPtr();
 	virtual WPJNode *DupCopy();
 	virtual U_INT	GetSize();
+
+	/// Getter And Setter
+	virtual void SetRotation(float fx, float fy);
+	virtual void SetScale(float fx, float fy);
 
 	/// Children And Parent
 	/**
@@ -130,7 +136,7 @@ public:
 	
 	/// Update
 	virtual void Update(float dt);
-	~WPJNode();
+	
 protected:
 	WPJNode();
 
@@ -144,7 +150,13 @@ private:
 	std::list<WPJNode* > m_lChildList;
 
 	WPJ_PROPERTY(WPJNode*, m_pParent, Parent)
-	WPJ_PROPERTY(WPJScheduler*, m_pScheduler, Scheduler);
+	WPJ_PROPERTY(WPJScheduler*, m_pScheduler, Scheduler)
+	
+	WPJ_PROPERTY(float, m_fRotationX, RotationX)
+	WPJ_PROPERTY(float, m_fRotationY, RotationY)
+	WPJ_PROPERTY(float, m_fScaleX, ScaleX)
+	WPJ_PROPERTY(float, m_fScaleY, ScaleY)
+	
 };
 
 NS_WPJ_END
