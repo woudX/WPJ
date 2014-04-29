@@ -21,9 +21,17 @@ int main(void *argc, void **argv)
 	_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
 
 	WPJNode *pNode = WPJNodeTest::CreateNewObject();
+	WPJNode *pNode2 = WPJNodeTest::CreateNewObject();
 	WPJScheduler *pSchedule = WPJScheduler::CreateNewObject();
+
 	pNode->SetScheduler(pSchedule);
+	pNode2->SetScheduler(pSchedule);
+
 	pNode->ScheduleUpdate();
+	pNode2->ScheduleUpdate();
+
+	pNode->AddChild(pNode2);
+
 	pNode->Schedule(schedule_selector(WPJNodeTest::TestFuncA), 3);
 	pNode->Schedule(schedule_selector(WPJNodeTest::TestFuncB), 2, 5, 4);
 	int i = 0;

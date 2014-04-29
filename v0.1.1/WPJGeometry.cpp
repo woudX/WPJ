@@ -56,6 +56,12 @@ bool WPJPoint::Equals(const WPJPoint &rhs) const
 	return (fabs(x - rhs.x) <= FLT_EPSILON && fabs(y - rhs.y) <= FLT_EPSILON);
 }
 
+void WPJPoint::SetPoint(float fx, float fy)
+{
+	x = fx;
+	y = fy;
+}
+
 float WPJPoint::GetAngle(const WPJPoint &rhs) const
 {
 	float t_fCross = Cross(rhs);

@@ -28,7 +28,7 @@ public:
 	WPJPoint operator / (float ft) const;
 
 	bool Equals (const WPJPoint &rhs) const;
-	
+	void SetPoint (float fx, float fy);
 	// Calculates the distance between this and origin
 	inline float GetLength() const
 	{

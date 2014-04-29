@@ -47,3 +47,10 @@ void WPJNodeTest::Update(float dt)
 {
 	WPJLOG("[%s] Test Info ... Come from Update , dt = %f\n" , __TIMESTAMP__, dt);
 }
+
+void WPJNodeTest::OnEnterTransitionDidFinish()
+{
+	WPJNode::OnEnterTransitionDidFinish();
+
+	WPJLOG("[%s] Admission gorgeous effect ! Great !\n", __TIMESTAMP__);
+}

@@ -4,6 +4,7 @@
 #include "WPJObject.h"
 #include "WPJMacros.h"
 #include "WPJScheduler.h"
+#include "WPJGeometry.h"
 
 NS_WPJ_BEGIN
 
@@ -19,15 +20,16 @@ NS_WPJ_BEGIN
 
 	WPJNode can be divide into these parts:
 	- Setters & Getters for Graphic Properties
-	- Children and Parent ¡Ì
-	- Event Callbacks
+	- Children and Parent	¡Ì
+	- Event Callbacks		¡Ì
 	- Actions
-	- Scheduler and Timer ¡Ì
+	- Scheduler and Timer	¡Ì
 	- Transformation
 	- Coordinate Converters
  */
 
 class WPJScheduler;
+class WPJPoint;
 
 class WPJNode : public WPJObject
 {
@@ -47,6 +49,34 @@ public:
 	/// Getter And Setter
 	virtual void SetRotation(float fx, float fy);
 	virtual void SetScale(float fx, float fy);
+	virtual void SetPosition(float fx, float fy);
+	virtual void SetAnchorPoint(float fx, float fy);
+
+	/// Event Callback
+	/**
+	 *	Event Callback Contains the method called atuomatically when WPJNode enter/exit the "stage"
+	 *	Thet are:
+	 *	- OnEnter
+	 *	- OnEnterTransitionDidFinish
+	 *	- OnExit
+	 *	- OnExitTransitionDidStart
+	 */
+
+	// If this node enter the "stage", this event will be called automatically
+	// While the event running, you can access 'brothers/sisters' by parents pointer
+	virtual void OnEnter();
+
+	// If this node enter the "stage", this event will be called automatically
+	// This method contain the effect when node enter
+	virtual void OnEnterTransitionDidFinish();
+
+	// If this node exit the "stage", this event will be called automatically
+	// While the event exiting, you can access 'brothers/sisters' by parents pointer
+	virtual void OnExit();
+
+	// If this node exit the "stage", this event will be called automatically
+	// This method contain the effect when node exit
+	virtual void OnExitTransitionDidStart();
 
 	/// Children And Parent
 	/**
@@ -129,7 +159,7 @@ public:
 	void UnscheduleAllSelectors();
 	
 	// Stop all schedules and actions about this node
-	void StopScheduleAndAction();
+	void PauseScheduleAndAction();
 
 	// Resume all schedules and actions about this node
 	void ResumeScheduleAndAction();
@@ -146,16 +176,21 @@ protected:
 
 	void CleanUp();
 	void DetachChild(WPJNode *p_pChild, bool p_bCleanup);
-private:
+
 	std::list<WPJNode* > m_lChildList;
+	
+	WPJ_PROPERTY_BY_REF(WPJPoint, m_obAnchorPoint, AnchorPoint)
+	WPJ_PROPERTY_BY_REF(WPJPoint, m_obPosition, Position)
 
 	WPJ_PROPERTY(WPJNode*, m_pParent, Parent)
 	WPJ_PROPERTY(WPJScheduler*, m_pScheduler, Scheduler)
-	
 	WPJ_PROPERTY(float, m_fRotationX, RotationX)
 	WPJ_PROPERTY(float, m_fRotationY, RotationY)
 	WPJ_PROPERTY(float, m_fScaleX, ScaleX)
 	WPJ_PROPERTY(float, m_fScaleY, ScaleY)
+	WPJ_PROPERTY(bool, m_bVisible, Visible)
+private:
+	
 	
 };
 

@@ -355,7 +355,7 @@ void WPJScheduler::CheckRemoveUpdate(std::list<_SchedulerUpdates*> &updateList,c
 _SchedulerUpdates *WPJScheduler::FindUpdateByTarget(const WPJObject *target)
 {
 	_SchedulerUpdates *t_pUpdate = NULL;
-	
+
 	find_in_list(_SchedulerUpdates*, t_pUpdate, target, m_lUpdate0List)
 	find_in_list(_SchedulerUpdates*, t_pUpdate, target, m_lUpdatePosList)
 	find_in_list(_SchedulerUpdates*, t_pUpdate, target, m_lUpdateNegList)
@@ -366,25 +366,33 @@ _SchedulerUpdates *WPJScheduler::FindUpdateByTarget(const WPJObject *target)
 void WPJScheduler::UnscheduleUpdateForTarget(const WPJObject *target)
 {
 	_SchedulerUpdates *t_pUpdate = FindUpdateByTarget(target);
-	t_pUpdate->markedForDeletion = true;
+
+	if (t_pUpdate != NULL)
+		t_pUpdate->markedForDeletion = true;
 }
 
 void WPJScheduler::PauseTarget(WPJObject *target)
 {
 	_SchedulerUpdates *t_pUpdate = FindUpdateByTarget(target);
-	t_pUpdate->paused = true;
+
+	if (t_pUpdate != NULL)
+		t_pUpdate->paused = true;
 }
 
 void WPJScheduler::ResumeTarget(WPJObject *target)
 {
 	_SchedulerUpdates *t_pUpdate = FindUpdateByTarget(target);
-	t_pUpdate->paused = false;
+
+	if (t_pUpdate != NULL)
+		t_pUpdate->paused = false;
 }
 
 bool WPJScheduler::IsTargetPaused(WPJObject *target)
 {
 	_SchedulerUpdates *t_pUpdate = FindUpdateByTarget(target);
-	return t_pUpdate->paused;
+
+	if (t_pUpdate != NULL)
+		return t_pUpdate->paused;
 }
 
 void WPJScheduler::Update(float dt)

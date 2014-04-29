@@ -116,6 +116,101 @@ void WPJNode::SetScale(float fx, float fy)
 	m_fScaleY = fy;
 }
 
+void WPJNode::SetPosition(WPJPoint var)
+{
+	m_obPosition = var;
+}
+
+void WPJNode::SetPosition(float fx, float fy)
+{
+	m_obPosition.x = fx;
+	m_obPosition.y = fy;
+}
+
+WPJPoint &WPJNode::GetPosition()
+{
+	return m_obPosition;
+}
+
+void WPJNode::SetAnchorPoint(WPJPoint var)
+{
+	m_obAnchorPoint = var;
+}
+
+void WPJNode::SetAnchorPoint(float fx, float fy)
+{
+	m_obAnchorPoint.x = fx;
+	m_obAnchorPoint.y = fy;
+}
+
+WPJPoint &WPJNode::GetAnchorPoint()
+{
+	return m_obAnchorPoint;
+}
+
+void WPJNode::SetVisible(bool var)
+{
+	m_bVisible = var;
+}
+
+bool WPJNode::GetVisible()
+{
+	return m_bVisible;
+}
+
+void WPJNode::OnEnter()
+{
+	m_bIsRunning = true;
+
+	foreach_in_list_auto(WPJNode*, itor, m_lChildList)
+	{
+		if (!(*itor)->m_bIsRunning)
+		{
+			(*itor)->OnEnter();
+		}
+	}
+
+	ResumeScheduleAndAction();
+}
+
+void WPJNode::OnEnterTransitionDidFinish()
+{
+	foreach_in_list_auto(WPJNode*, itor, m_lChildList)
+	{
+		if ((*itor))
+		{
+			(*itor)->OnEnterTransitionDidFinish();
+		}
+	}
+}
+
+void WPJNode::OnExit()
+{
+	this->PauseScheduleAndAction();
+
+	m_bIsRunning = false;
+
+	foreach_in_list_auto(WPJNode*, itor, m_lChildList)
+	{
+		if (*itor)
+		{
+			(*itor)->OnExit();
+		}
+	}
+}
+
+void WPJNode::OnExitTransitionDidStart()
+{
+	foreach_in_list_auto(WPJNode*, itor, m_lChildList)
+	{
+		if (*itor)
+		{
+			(*itor)->OnExitTransitionDidStart();
+		}
+	}
+}
+
+
 void WPJNode::AddChild(WPJNode *p_pChild)
 {
 	AddChild(p_pChild, p_pChild->m_iZOrder, p_pChild->m_iTag);
@@ -142,7 +237,9 @@ void WPJNode::AddChild(WPJNode *p_pChild, int p_izOrder, int p_iTag)
 
 	if (m_bIsRunning)
 	{
-		// To-do:call OnEnter and OnEnterTransitionDidFinish
+		// call OnEnter and OnEnterTransitionDidFinish
+		pSharedChild->OnEnter();
+		pSharedChild->OnEnterTransitionDidFinish();
 	}
 }
 
@@ -201,14 +298,16 @@ void WPJNode::RemoveAllChild(bool p_bCleanup)
 	foreach_in_list_auto(WPJNode*, itor, m_lChildList)
 	{
 		//To-Do: 
-		// 1. call OnExit and OnExitTransitionDidFinish
+		// 1. call OnExit and OnExitTransitionDidStart
 		// 2. Clean Up and Remove
 		// 3. What should be done about this child's childList??? They need to be Cleanup?
 		//	maybe provide a method to destroy tree is a good idea, when needed, use it.
 
 		if (m_bIsRunning)
 		{
-			// call OnExit and OnExitTransitionDidFinish
+			// call OnExit and OnExitTransitionDidStart
+			(*itor)->OnExit();
+			(*itor)->OnExitTransitionDidStart();
 		}
 
 		// if don't call cleanup, it's Schedules and Actions won't be released
@@ -231,14 +330,16 @@ void WPJNode::CleanUp()
 void WPJNode::DetachChild(WPJNode *p_pChild, bool p_bCleanup)
 {
 	//To-Do: 
-	// 1. call OnExit and OnExitTransitionDidFinish
+	// 1. call OnExit and OnExitTransitionDidStart
 	// 2. Clean Up and Remove
 	// 3. What should be done about this child's childList??? They need to be Cleanup?
 	//	maybe provide a method to destroy tree is a good idea, when needed, use it.
 
 	if (m_bIsRunning)
 	{
-		// call OnExit and OnExitTransitionDidFinish
+		// call OnExit and OnExitTransitionDidStart
+		p_pChild->OnExit();
+		p_pChild->OnExitTransitionDidStart();
 	}
 
 	// if don't call cleanup, it's Schedules and Actions won't be released
@@ -291,7 +392,7 @@ void WPJNode::UnscheduleAllSelectors()
 	m_pScheduler->UnscheduleAllSelector(this);
 }
 
-void WPJNode::StopScheduleAndAction()
+void WPJNode::PauseScheduleAndAction()
 {
 	m_pScheduler->PauseTarget(this);
 }

@@ -100,14 +100,18 @@ public: virtual varType Get##funcName();
 protected: varType varName;\
 public: virtual varType Get##funcName();\
 public: virtual void Set##funcName(varType var);
-/*
-#define FIND_TIMER_LIST(varType, list, varPtr, findPtr)\
-	std::list<WPJTimer*>
-	for (list<varType>::iterator itor = list.begin(); itor != list.end(); itor++)\
-	{\
-		if ((*itor)->target == varPtr)\
-		\
-	}*/
+
+/** WPJ_PROPERTY_BY_REF is used to declare property
+ we can use getter/setter to get/set the var
+ @varType : the type of property
+ @varName : the name of property
+ @funcName: the name of getter/setter
+*/
+
+#define WPJ_PROPERTY_BY_REF(varType,varName,funcName)\
+protected: varType varName;\
+public: virtual varType &Get##funcName();\
+public: virtual void Set##funcName(varType var);
 #endif
 
 
