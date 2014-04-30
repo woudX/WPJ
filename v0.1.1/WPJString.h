@@ -20,6 +20,9 @@ public:
 	HString();
 	HString(std::string orgi);
 	HString(const HString *orgi);
+	HString &operator= (const HString &rhs);
+
+	const char *c_str();
 	U_INT Hash(std::string _str);
 	bool EqualWith(const HString *rhs);
 };

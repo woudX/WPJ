@@ -6,19 +6,80 @@
 #include "WPJString.h"
 #include "WPJScheduler.h"
 #include "WPJTest.h"
-
+#include "WPJALGOManager.h"
 #include <windows.h>
+#include <stdio.h>
+#include <allegro5/allegro.h>
 
 USING_NS_WPJ;
 
 void PoolTesting();
 void GCTesting();
 
-int main(void *argc, void **argv)
+int main(int argc, char **argv)
 {
 	_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF|_CRTDBG_ALLOC_MEM_DF);
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
+
+	WPJALGOManager *allegroMgr = WPJALGOManager::GetSharedInst();
+	allegroMgr->SetWndSize(800, 450);
+	allegroMgr->SetWndName(HString("²âÊÔ´°¿Ú"));
+	allegroMgr->InitALGO();
+
+	while (1)
+	{
+		ALLEGRO_EVENT e = allegroMgr->WaitForEvent();
+
+		if (e.type == ALLEGRO_EVENT_KEY_DOWN)
+			if (e.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+				break;
+			else
+				WPJLOG("[%s] ´Ó¼üÅÌÊäÈë ... %d\n", __TIMESTAMP__, e.keyboard.keycode);
+			
+		Sleep(1000 / 60);
+	}
+	
+	WPJALGOManager::GetSharedInst()->DestroyALGO();
+
+	delete WPJALGOManager::GetSharedInst();
+	system("pause");
+	return 0;
+	
+}
+
+/// AllegroTesting
+//////////////////////////////////////////////////////////////////////////
+int AllegroTesting()
+{
+	ALLEGRO_DISPLAY *display = NULL;
+
+	if(!al_init()) {
+		fprintf(stderr, "failed to initialize allegro!\n");
+		return -1;
+	}
+
+	display = al_create_display(640, 480);
+	if(!display) {
+		fprintf(stderr, "failed to create display!\n");
+		return -1;
+	}
+
+	al_clear_to_color(al_map_rgb(0,0,0));
+
+	al_flip_display();
+
+	al_rest(3.0);
+
+	al_destroy_display(display);
+
+	return 0;
+}
+
+/// WPJNodeTesting
+//////////////////////////////////////////////////////////////////////////
+void WPJNodeTesting()
+{
 
 	WPJNode *pNode = WPJNodeTest::CreateNewObject();
 	WPJNode *pNode2 = WPJNodeTest::CreateNewObject();
@@ -54,16 +115,6 @@ int main(void *argc, void **argv)
 	WPJGC::GetSharedInst()->GC();
 
 	delete WPJGC::GetSharedInst();
-	system("pause");
-	return 0;
-}
-
-
-/// WPJNodeTesting
-//////////////////////////////////////////////////////////////////////////
-void WPJNodeTesting()
-{
-
 }
 
 /// SchedulerTesting

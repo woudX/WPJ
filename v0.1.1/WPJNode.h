@@ -24,12 +24,10 @@ NS_WPJ_BEGIN
 	- Event Callbacks		¡Ì
 	- Actions
 	- Scheduler and Timer	¡Ì
+	- Draw					¡Ì
 	- Transformation
 	- Coordinate Converters
  */
-
-class WPJScheduler;
-class WPJPoint;
 
 class WPJNode : public WPJObject
 {
@@ -47,6 +45,10 @@ public:
 	virtual U_INT	GetSize();
 
 	/// Getter And Setter
+	/**
+	 *	These are not all of the getter and setter, some are defined by marco, for example,
+	 *	WPJ_PROPERTY define getter/setter, more detail info can be seen in 'WPJMarcos.h'
+	 */
 	virtual void SetRotation(float fx, float fy);
 	virtual void SetScale(float fx, float fy);
 	virtual void SetPosition(float fx, float fy);
@@ -62,7 +64,7 @@ public:
 	 *	- OnExitTransitionDidStart
 	 */
 
-	// If this node enter the "stage", this event will be called automatically
+	// If this node enter the "stage", this event will be called automatically[
 	// While the event running, you can access 'brothers/sisters' by parents pointer
 	virtual void OnEnter();
 
@@ -121,6 +123,18 @@ public:
 	// If not cleanup, child's schedules and actions won't be released
 	virtual void RemoveAllChild(bool p_bCleanup = true);
 	
+	/// Draw
+	/**
+	 *	Actually, draw method is the package of allegro, but the user needn't to learn how to
+	 *	use allegro
+	 */
+
+	// Draw method, override this
+	virtual void Draw();
+
+	// Visits this node's children and draw them recursively
+	virtual void Visit();
+
 	/// Scheduler And Timer
 	/**
 	 *	WPJNode contain a scheduler class therefore it only packaged Scheduler's interfaces but 

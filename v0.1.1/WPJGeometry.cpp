@@ -85,3 +85,78 @@ WPJPoint::~WPJPoint()
 {
 
 }
+
+WPJSize::WPJSize()
+:width(0.f)
+,height(0.f)
+{
+
+}
+
+WPJSize::WPJSize(const WPJSize &rhs)
+:width(rhs.width)
+,height(rhs.height)
+{
+
+}
+
+WPJSize::WPJSize(float fx, float fy)
+:width(fx)
+,height(fy)
+{
+
+}
+
+WPJSize::WPJSize(const WPJPoint &rhs)
+{
+	SetSize(rhs.x, rhs.y);
+}
+
+WPJSize &WPJSize::operator= (const WPJSize &rhs)
+{
+	SetSize(rhs.width, rhs.height);
+	return *this;
+}
+
+WPJSize &WPJSize::operator= (const WPJPoint &rhs)
+{
+	SetSize(rhs.x, rhs.y);
+	return *this;
+}
+
+WPJSize WPJSize::operator+ (const WPJSize &rhs) const
+{
+	return WPJSize(width + rhs.width, height + rhs.height);
+}
+
+WPJSize WPJSize::operator- (const WPJSize &rhs) const
+{
+	return WPJSize(width - rhs.width, height - rhs.height);
+}
+
+WPJSize WPJSize::operator* (const WPJSize &rhs) const
+{
+	return WPJSize(width * rhs.width, height * rhs.height);
+}
+
+WPJSize WPJSize::operator/ (const WPJSize &rhs) const
+{
+	ASSERT(rhs.width != 0 && rhs.height != 0);
+	return WPJSize(width / rhs.width, height / rhs.height);
+}
+
+void WPJSize::SetSize(float fx, float fy)
+{
+	width = fx;
+	height = fy;
+}
+
+bool WPJSize::Equals(const WPJSize &rhs) const
+{
+	return fabs(width - rhs.width) <= FLT_EPSILON && fabs(height - rhs.height) <= FLT_EPSILON;
+}
+
+WPJSize::~WPJSize()
+{
+
+}

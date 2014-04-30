@@ -1,5 +1,5 @@
 #ifndef _H_WPJGEOMETRY
-#define _H_WPJGEOMETR
+#define _H_WPJGEOMETRY
 
 #include "WPJStdafx.h"
 #include "WPJMacros.h"
@@ -7,6 +7,7 @@
 /**
  *	WPJGeometry contains many kinds of geometry class used in the WPJEngine, including:
  *	- WPJPoint
+ *	- WPJSize
  */
 
 NS_WPJ_BEGIN
@@ -140,6 +141,28 @@ public:
 
 	// Static Rotates (0,0)
 	static WPJPoint zero;
+};
+
+class WPJSize
+{
+public:
+	float width, height;
+	WPJSize();
+	WPJSize(const WPJSize &rhs);
+	WPJSize(const WPJPoint &rhs);
+	WPJSize(float fx, float fy);
+
+	void SetSize(float fx, float fy);
+	bool Equals(const WPJSize &rhs) const;
+
+	WPJSize &operator= (const WPJSize &rhs);
+	WPJSize &operator= (const WPJPoint &rhs);
+	WPJSize operator+ (const WPJSize &rhs) const;
+	WPJSize operator- (const WPJSize &rhs) const;
+	WPJSize operator* (const WPJSize &rhs) const;
+	WPJSize operator/ (const WPJSize &rhs) const;
+
+	~WPJSize();
 };
 
 NS_WPJ_END

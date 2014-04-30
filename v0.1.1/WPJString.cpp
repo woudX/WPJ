@@ -19,6 +19,13 @@ HString::HString(HString const *orgi)
 	hashCode = orgi->hashCode;
 }
 
+HString &HString::operator= (const HString &rhs)
+{
+	str = rhs.str;
+	hashCode = rhs.hashCode;
+	return *this;
+}
+
 bool HString::EqualWith(HString const *rhs)
 {
 	return hashCode == rhs->hashCode;
@@ -36,4 +43,10 @@ U_INT HString::Hash(std::string _str)
 	}
 
 	return t_uHashCode;
+}
+
+
+const char *HString::c_str()
+{
+	return str.c_str();
 }

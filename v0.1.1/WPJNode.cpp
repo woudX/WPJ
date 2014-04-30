@@ -352,6 +352,42 @@ void WPJNode::DetachChild(WPJNode *p_pChild, bool p_bCleanup)
 	p_pChild->Release();
 }
 
+void WPJNode::Draw()
+{
+
+}
+
+void WPJNode::Visit()
+{
+	if (!m_bVisible)
+		return ;
+
+	if (m_lChildList.size() != 0)
+	{
+		// Visit node which zOrder < 0
+		foreach_in_list_auto(WPJNode*, itor, m_lChildList)
+		{
+			if ((*itor)->m_iZOrder < 0)
+				(*itor)->Visit();
+		}
+
+		this->Draw();
+
+		// Visit node which zOrder > 0
+		foreach_in_list_auto(WPJNode*, itor, m_lChildList)
+		{
+			if ((*itor)->m_iZOrder > 0)
+				(*itor)->Visit();
+		}
+		
+	}
+	else
+	{
+		// This is leaf node
+		this->Draw();
+	}
+}
+
 void WPJNode::Schedule(SEL_SCHEDULE pfnSelector)
 {
 	m_pScheduler->ScheduleSelector(this, pfnSelector, 0, !m_bIsRunning);
