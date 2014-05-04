@@ -5,6 +5,7 @@
 #include "WPJMacros.h"
 #include "WPJScheduler.h"
 #include "WPJGeometry.h"
+#include "WPJLib.h"
 
 NS_WPJ_BEGIN
 

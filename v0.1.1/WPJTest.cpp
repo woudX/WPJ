@@ -35,22 +35,22 @@ WPJNodeTest *WPJNodeTest::DupCopy()
 
 void WPJNodeTest::TestFuncA(float dt)
 {
-	WPJLOG("[%s] Test Info ... Come from TestFuncA , dt = %f\n" , __TIMESTAMP__, dt);
+	WPJLOG("[%s] Test Info ... Come from TestFuncA , dt = %f\n" , _D_NOW_TIME__, dt);
 }
 
 void WPJNodeTest::TestFuncB(float dt)
 {
-	WPJLOG("[%s] Test Info ... Come from TestFuncB , dt = %f\n" , __TIMESTAMP__, dt);
+	WPJLOG("[%s] Test Info ... Come from TestFuncB , dt = %f\n" , _D_NOW_TIME__, dt);
 }
 
 void WPJNodeTest::Update(float dt)
 {
-	WPJLOG("[%s] Test Info ... Come from Update , dt = %f\n" , __TIMESTAMP__, dt);
+	WPJLOG("[%s] Test Info ... Come from Update , dt = %f\n" , _D_NOW_TIME__, dt);
 }
 
 void WPJNodeTest::OnEnterTransitionDidFinish()
 {
 	WPJNode::OnEnterTransitionDidFinish();
 
-	WPJLOG("[%s] Admission gorgeous effect ! Great !\n", __TIMESTAMP__);
+	WPJLOG("[%s] Admission gorgeous effect ! Great !\n", _D_NOW_TIME__);
 }

@@ -3,9 +3,11 @@
 
 #include "WPJStdafx.h"
 #include "WPJMacros.h"
-#include <allegro5/allegro.h>
 #include "WPJGeometry.h"
 #include "WPJString.h"
+#include "WPJLib.h"
+
+#include <allegro5/allegro.h>
 
 NS_WPJ_BEGIN
 

@@ -7,14 +7,17 @@
 #include "WPJScheduler.h"
 #include "WPJTest.h"
 #include "WPJALGOManager.h"
+#include "WPJDebug.h"
 #include <windows.h>
 #include <stdio.h>
 #include <allegro5/allegro.h>
+#include <ctime>
 
-USING_NS_WPJ;
+USING_NS_WPJ
 
 void PoolTesting();
 void GCTesting();
+void WPJNodeTesting();
 
 int main(int argc, char **argv)
 {
@@ -22,11 +25,11 @@ int main(int argc, char **argv)
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
 
+
 	WPJALGOManager *allegroMgr = WPJALGOManager::GetSharedInst();
 	allegroMgr->SetWndSize(800, 450);
 	allegroMgr->SetWndName(HString("²âÊÔ´°¿Ú"));
 	allegroMgr->InitALGO();
-
 	while (1)
 	{
 		ALLEGRO_EVENT e = allegroMgr->WaitForEvent();
@@ -35,7 +38,7 @@ int main(int argc, char **argv)
 			if (e.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
 				break;
 			else
-				WPJLOG("[%s] ´Ó¼üÅÌÊäÈë ... %d\n", __TIMESTAMP__, e.keyboard.keycode);
+				WPJLOG("[%s] ´Ó¼üÅÌÊäÈë ... %d\n", _D_NOW_TIME__, e.keyboard.keycode);
 			
 		Sleep(1000 / 60);
 	}
@@ -43,6 +46,9 @@ int main(int argc, char **argv)
 	WPJALGOManager::GetSharedInst()->DestroyALGO();
 
 	delete WPJALGOManager::GetSharedInst();
+
+
+	WPJNodeTesting();
 	system("pause");
 	return 0;
 	
@@ -98,9 +104,9 @@ void WPJNodeTesting()
 	int i = 0;
 	while (i++ < 20)
 	{
-		WPJLOG("--- Frame %d Start ----- %s -----\n", i, __TIMESTAMP__);
+		WPJLOG("--- Frame %d Start ----- %s -----\n", i, _D_NOW_TIME__);
 		pSchedule->Update(1);
-		WPJLOG("--- Frame %d End   ----- %s -----\n>>>\n", i, __TIMESTAMP__);
+		WPJLOG("--- Frame %d End   ----- %s -----\n>>>\n", i, _D_NOW_TIME__);
 
 		if (i == 12)
 			pNode->UnscheduleUpdate();

@@ -57,7 +57,7 @@ void WPJGC::GC()
 			itor++;
 	}
 
-	WPJLOG("[%s] GC ... Once Complete!\n",__TIMESTAMP__);
+	WPJLOG("[%s] GC ... Once Complete!\n",_D_NOW_TIME__);
 }
 
 void WPJGC::CheckMemoryLeak()

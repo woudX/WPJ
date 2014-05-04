@@ -214,7 +214,7 @@ void WPJScheduler::ScheduleSelector(WPJObject *target, SEL_SCHEDULE pfnSelector,
 				if ((*t_itor)->GetpfnSelector() == pfnSelector)
 				{
 					t_bSame = true;
-					WPJLOG("[%s] Error:%s\n", __TIMESTAMP__, "this selector has been added into timers");
+					WPJLOG("[%s] Error:%s\n", _D_NOW_TIME__, "this selector has been added into timers");
 					break;
 				}
 			}
@@ -312,7 +312,7 @@ void WPJScheduler::CheckInsertUpdate(std::list<_SchedulerUpdates*> &updateList, 
 		if ((*itor)->target == target)
 		{
 			t_bAlreadyExist = true;
-			WPJLOG("[%s] Info : target has already been inserted\n", __TIMESTAMP__);
+			WPJLOG("[%s] Info : target has already been inserted\n", _D_NOW_TIME__);
 		}
 	}
 

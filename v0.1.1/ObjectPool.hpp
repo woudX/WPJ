@@ -62,7 +62,7 @@ public:
 		}
 
 		WPJLOG("[%s] Object Pool ... %d change to idle\n", __TIME__, bIdleCount);
-		WPJLOG("[%s] Object Pool ... Complete!\n", __TIMESTAMP__);
+		WPJLOG("[%s] Object Pool ... Complete!\n", _D_NOW_TIME__);
 	}
 
 	virtual ~ObjectPool()

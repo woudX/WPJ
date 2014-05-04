@@ -50,7 +50,7 @@ void WPJALGOManager::InitALGO()
 	// Intialize allegro system
 	if (!al_init()) 
 	{
-		WPJLOG("[%s] Error in %s(%s) ... Failed to initialize allegro\n", __TIMESTAMP__, __FILE__, __LINE__);
+		WPJLOG("[%s] Error in %s(%s) ... Failed to initialize allegro\n", _D_NOW_TIME__, __FILE__, __LINE__);
 		return ;
 	}
 	al_install_mouse();
@@ -60,7 +60,7 @@ void WPJALGOManager::InitALGO()
 	m_pDisplay = al_create_display(m_obWndSize.width, m_obWndSize.height);
 	if (!m_pDisplay)
 	{
-		WPJLOG("[%s] Error in %s(%s) ... Failed to create display\n", __TIMESTAMP__, __FILE__, __LINE__);
+		WPJLOG("[%s] Error in %s(%s) ... Failed to create display\n", _D_NOW_TIME__, __FILE__, __LINE__);
 	}
 
 	// Initialize window params
