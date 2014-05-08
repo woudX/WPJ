@@ -1,5 +1,5 @@
 #include "WPJDebug.h"
-
+/*
 USING_NS_WPJ
 
 time_t WPJTime::obTime;
@@ -13,3 +13,4 @@ char* WPJTime::NowTime()
 
 	return t_obTime;
 }
+*/

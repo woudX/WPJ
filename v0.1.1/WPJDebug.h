@@ -8,14 +8,14 @@
 #include <ctime>
 
 NS_WPJ_BEGIN
-
+	/*
 class WPJTime
 {
 public:
 	static time_t obTime;
 	static char* NowTime();
 };
-
+*/
 NS_WPJ_END
 
 #endif // !_H_WPJDEBUG

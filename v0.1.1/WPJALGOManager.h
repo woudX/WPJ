@@ -43,7 +43,7 @@ public:
 	 *	- KeyBoard
 	 *	- Mouse
 	 */
-	ALLEGRO_EVENT &WaitForEvent();
+	bool WaitForEvent(ALLEGRO_EVENT& e);
 
 	static WPJALGOManager *GetSharedInst();
 

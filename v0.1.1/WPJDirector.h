@@ -21,7 +21,7 @@ NS_WPJ_BEGIN
 class WPJDirector : public WPJObject
 {
 public:
-	WPJDirector *GetSharedInst();
+	static WPJDirector *GetSharedInst();
 
 	/**
 	 *	WPJDirector Props
@@ -51,7 +51,9 @@ public:
 	 *	WPJDirector Flow Control
 	 */
 	virtual void MainLoop();
+	void CalculateInterval();
 	void End();
+	void ShowStatus();
 
 	/**
 	 *	Draw Engine
@@ -63,7 +65,15 @@ public:
 protected:
 	WPJDirector();
 
+	TimeVal *m_pLastTimeVal;
+	float m_fDeltaTime;
+	U_INT m_uFrames;
+	float m_fAccumDt;
+
 	bool m_bPause;
+	bool m_bExit;
+	bool m_bTimeStart;
+
 	WPJ_PROPERTY(WPJScheduler* ,m_pScheduler, Scheduler)
 	WPJ_PROPERTY_READONLY(WPJALGOManager*, m_pALGOManager, ALGOManager)
 private:

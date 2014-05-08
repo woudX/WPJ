@@ -87,10 +87,9 @@ bool WPJALGOManager::IsALGOReady()
 	return m_pDisplay;
 }
 
-ALLEGRO_EVENT& WPJALGOManager::WaitForEvent()
+bool WPJALGOManager::WaitForEvent(ALLEGRO_EVENT& e)
 {
-	al_wait_for_event(m_pEventQueue, &m_obEvent);
-	return m_obEvent;
+	return al_wait_for_event_timed(m_pEventQueue, &e, 0.001f);
 }
 
 WPJALGOManager::~WPJALGOManager()
