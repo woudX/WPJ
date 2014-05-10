@@ -27,14 +27,38 @@ void WPJAppDelegate::SetAnimationInterval(double interval)
 bool WPJAppDelegate::Initialization()
 {
 	WPJDirector *t_pDirector = WPJDirector::GetSharedInst();
-	WPJALGOManager *t_pALGOMgr = t_pDirector->GetALGOManager();
+
+	// Set FPS, default value is 1.0/60
+	t_pDirector->SetAnimationInterval(1.0 / 60);
+
+	// User customed init
+	if (!ExtendInit())
+	{
+		WPJLOG("[%s] WPJAppDelegate ... error in ExtendInit\n", _D_NOW_TIME__);
+		return false;
+	}	
+	
+	// Init ALGO
+	if (!WPJALGOManager::GetSharedInst()->InitALGO())
+	{
+		WPJLOG("[%s] WPJAppDelegate ... error in InitALGO\n", _D_NOW_TIME__);
+		return false;
+	}
+
+	// Init Scene
+	WPJScene *t_pScene = WPJScene::CreateNewObject();
+	t_pDirector->RunWithScene(t_pScene);
+	t_pScene->Release();
+
+	return true;
+}
+
+bool WPJAppDelegate::ExtendInit()
+{
+	WPJALGOManager *t_pALGOMgr = WPJALGOManager::GetSharedInst();
 
 	t_pALGOMgr->SetWndSize(800, 600);
 	t_pALGOMgr->SetWndName(HString("²âÊÔ´°¿Ú"));
-	t_pALGOMgr->InitALGO();
-
-	SetAnimationInterval(1.0 / 60);
-	
 
 	return true;
 }

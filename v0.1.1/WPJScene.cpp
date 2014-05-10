@@ -3,6 +3,12 @@
 
 USING_NS_WPJ
 
+void WPJScene::GetSharedPtr(WPJScene* &object)
+{
+	object = this;
+	object->Retain();
+}
+
 WPJScene *WPJScene::CreateNewObject()
 {
 	WPJScene *t_pScene = new WPJScene();

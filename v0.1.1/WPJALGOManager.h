@@ -28,7 +28,7 @@ public:
 	 *	These are allegro packaged method, so user can use this method easily
 	 */
 	// Initalize Allegro, call this method after setting WPJEGLManager params
-	void InitALGO();
+	bool InitALGO();
 
 	// Destroy Allegro
 	void DestroyALGO();

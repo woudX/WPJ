@@ -45,13 +45,13 @@ WPJSize &WPJALGOManager::GetWndSize()
 	return m_obWndSize;
 }
 
-void WPJALGOManager::InitALGO()
+bool WPJALGOManager::InitALGO()
 {
 	// Intialize allegro system
 	if (!al_init()) 
 	{
 		WPJLOG("[%s] Error in %s(%s) ... Failed to initialize allegro\n", _D_NOW_TIME__, __FILE__, __LINE__);
-		return ;
+		return false;
 	}
 	al_install_mouse();
 	al_install_keyboard();
@@ -61,6 +61,7 @@ void WPJALGOManager::InitALGO()
 	if (!m_pDisplay)
 	{
 		WPJLOG("[%s] Error in %s(%s) ... Failed to create display\n", _D_NOW_TIME__, __FILE__, __LINE__);
+		return false;
 	}
 
 	// Initialize window params
@@ -75,6 +76,8 @@ void WPJALGOManager::InitALGO()
 
 	// Show
 	al_flip_display();
+
+	return true;
 }
 
 void WPJALGOManager::DestroyALGO()

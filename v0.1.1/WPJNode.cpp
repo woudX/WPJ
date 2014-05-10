@@ -158,6 +158,11 @@ bool WPJNode::GetVisible()
 	return m_bVisible;
 }
 
+bool WPJNode::IsRunning()
+{
+	return m_bIsRunning;
+}
+
 void WPJNode::OnEnter()
 {
 	m_bIsRunning = true;

@@ -54,6 +54,7 @@ public:
 	virtual void SetScale(float fx, float fy);
 	virtual void SetPosition(float fx, float fy);
 	virtual void SetAnchorPoint(float fx, float fy);
+	virtual bool IsRunning();
 
 	/// Event Callback
 	/**
@@ -181,7 +182,7 @@ public:
 	
 	/// Update
 	virtual void Update(float dt);
-	
+	virtual void CleanUp();
 protected:
 	WPJNode();
 
@@ -189,7 +190,7 @@ protected:
 	int m_iTag;
 	bool m_bIsRunning;
 
-	void CleanUp();
+	
 	void DetachChild(WPJNode *p_pChild, bool p_bCleanup);
 
 	std::list<WPJNode* > m_lChildList;

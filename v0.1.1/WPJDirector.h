@@ -43,7 +43,7 @@ public:
 	void PushScene(WPJScene *pScene);
 	void PopScene();
 	void PopToRootScene();
-	void PopToSceneStackLevel(int pStackLevel = 1);
+	void PopToSceneStackLevel(int pStackLevel);
 	void RunWithScene(WPJScene *pScene);
 	void ReplaceWithScene(WPJScene *pScene);
 
@@ -54,6 +54,9 @@ public:
 	void CalculateInterval();
 	void End();
 	void ShowStatus();
+	virtual void SetAnimationInterval(double dValue);
+	virtual void StartAnimation();
+	virtual void StopAnimation();
 
 	/**
 	 *	Draw Engine
@@ -74,12 +77,38 @@ protected:
 	bool m_bExit;
 	bool m_bTimeStart;
 
+	// if m_bCleanUpRunningScene = true, the old scene will be clear
+	bool m_bCleanUpRunningScene;
+
+	double m_dAnimationInterval;
+
+	// m_pNextScene will be update & draw in next frame
+	WPJScene *m_pNextScene;
+	WPJScene *m_pRunningScene;
+
 	WPJ_PROPERTY(WPJScheduler* ,m_pScheduler, Scheduler)
 	WPJ_PROPERTY_READONLY(WPJALGOManager*, m_pALGOManager, ALGOManager)
 private:
 	static WPJDirector *m_pInst;
 	
 	std::stack<WPJScene*> m_obSceneStack;
+};
+
+/**
+ *	This extend class is used to synchronizes timer with the refresh rate of display.
+ *	Scheduled timer and drawing are synchronizes with the refresh rate of display.
+ */
+class WPJDisplayLinkDirector : public WPJDirector
+{
+public:
+	WPJDisplayLinkDirector();
+	virtual void MainLoop();
+	virtual void SetAnimationInterval(double dValue);
+	virtual void StartAnimation();
+	virtual void StopAnimation();
+
+protected:
+	bool m_bInvalid;
 };
 
 NS_WPJ_END

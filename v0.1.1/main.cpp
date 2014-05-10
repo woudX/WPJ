@@ -11,6 +11,7 @@
 #include "WPJAppDelegate.h"
 #include <windows.h>
 #include <stdio.h>
+#include "WPJList.h"
 #include <ctime>
 
 USING_NS_WPJ
@@ -25,8 +26,7 @@ int main(int argc, char **argv)
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
 
-	return WPJAppDelegate::GetSharedInst()->Run();
-	
+	return WPJAppDelegate::GetSharedInst()->Run();	
 }
 
 /// AllegroTesting

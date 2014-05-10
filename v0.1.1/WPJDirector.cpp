@@ -1,5 +1,5 @@
 #include "WPJDirector.h"
-
+#include "WPJAppDelegate.h"
 USING_NS_WPJ
 
 WPJDirector *WPJDirector::m_pInst = 0;
@@ -7,7 +7,7 @@ WPJDirector *WPJDirector::m_pInst = 0;
 WPJDirector *WPJDirector::GetSharedInst()
 {
 	if (m_pInst == 0)
-		m_pInst = new WPJDirector;
+		m_pInst = new WPJDisplayLinkDirector;
 
 	return m_pInst;
 }
@@ -47,31 +47,92 @@ WPJDirector::WPJDirector()
 void WPJDirector::RunWithScene(WPJScene *pScene) 
 {
 	PushScene(pScene);
+	StartAnimation();
 }
 
 void WPJDirector::PushScene(WPJScene *pScene)
 {
+	m_obSceneStack.push(pScene);
+	pScene->Retain();
 
+	m_bCleanUpRunningScene = false;
+
+	pScene->GetSharedPtr(m_pNextScene);
 }
 
 void WPJDirector::PopScene()
 {
+	WPJScene *t_pScene = m_obSceneStack.top();
+	m_obSceneStack.pop();
+	t_pScene->Release();
 
+	// No scene, exit
+	if (m_obSceneStack.size() == 0)
+	{
+		End();
+	}
+	else
+	{
+		m_bCleanUpRunningScene = true;
+		m_obSceneStack.top()->GetSharedPtr(m_pNextScene);
+	}
 }
 
 void WPJDirector::ReplaceWithScene(WPJScene *pScene)
 {
+	WPJScene *t_pScene = m_obSceneStack.top();
+	m_obSceneStack.pop();
+	t_pScene->Release();
 
+	m_bCleanUpRunningScene = true;
+
+	m_obSceneStack.push(pScene);
+	pScene->Retain();
 }
 
 void WPJDirector::PopToRootScene()
 {
-
+	PopToSceneStackLevel(1);
 }
 
-void WPJDirector::PopToSceneStackLevel(int pStackLevel /* = 1 */) 
+void WPJDirector::PopToSceneStackLevel(int pStackLevel) 
 {
+	int t_iCount = m_obSceneStack.size();
 
+	if (t_iCount == 0)
+	{
+		End();
+		return ;
+	}
+
+	if (t_iCount <= pStackLevel)
+	{
+		return ;
+	}
+
+	if (t_iCount > pStackLevel)
+	{
+		// Remove scene, run OnExitTransitionDidStart and OnExit
+		while (t_iCount > pStackLevel)
+		{
+			WPJScene *t_pScene = m_obSceneStack.top();
+			m_obSceneStack.pop();
+			
+			if (t_pScene->IsRunning())
+			{
+				t_pScene->OnExitTransitionDidStart();
+				t_pScene->OnExit();
+			}
+			t_pScene->CleanUp();
+			t_pScene->Release();
+
+			--t_iCount;
+		}
+
+		// Set next scene but not CleanupRunningScene
+		m_obSceneStack.top()->GetSharedPtr(m_pNextScene);
+		m_bCleanUpRunningScene = false;
+	}
 }
 
 void WPJDirector::Pause()
@@ -79,6 +140,7 @@ void WPJDirector::Pause()
 	m_bPause = true;
 	
 	// To-do: pause all but draw, reduce draw frequency
+	SetAnimationInterval(1.0 / 4);
 }
 
 void WPJDirector::Resume()
@@ -86,6 +148,7 @@ void WPJDirector::Resume()
 	m_bPause = false;
 
 	// To-do: resume all enclude draw frequency
+	SetAnimationInterval(1.0 / 60);
 }
 
 void WPJDirector::MainLoop()
@@ -142,4 +205,60 @@ void WPJDirector::ShowStatus()
 		m_fAccumDt = 0;
 	}
 
+}
+
+void WPJDirector::SetAnimationInterval(double dValue)
+{
+
+}
+
+void WPJDirector::StartAnimation()
+{
+
+}
+
+void WPJDirector::StopAnimation()
+{
+
+}
+
+WPJDisplayLinkDirector::WPJDisplayLinkDirector()
+	:m_bInvalid(false)
+{
+
+}
+
+void WPJDisplayLinkDirector::MainLoop()
+{
+	if (m_bExit)
+		End();
+	else if (! m_bInvalid)
+		Draw();
+}
+
+void WPJDisplayLinkDirector::SetAnimationInterval(double dValue)
+{
+	m_dAnimationInterval = dValue;
+	if (! m_bInvalid)
+	{
+		StopAnimation();
+		StartAnimation();
+	}
+}
+
+void WPJDisplayLinkDirector::StartAnimation()
+{
+	if (WPJTime::GetTimeOfDay(m_pLastTimeVal) != 0)
+	{
+		WPJLOG("[%s] DisPlayLinkDirector ... error on GetTimeOfDay\n", _D_NOW_TIME__);
+	}
+
+	m_bInvalid = false;
+
+	WPJAppDelegate::GetSharedInst()->SetAnimationInterval(m_dAnimationInterval);
+}
+
+void WPJDisplayLinkDirector::StopAnimation()
+{
+	m_bInvalid = true;
 }

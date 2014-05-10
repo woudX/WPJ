@@ -16,7 +16,7 @@ public:
 	int Run();
 
 	virtual bool Initialization();
-
+	virtual bool ExtendInit();
 protected:
 	WPJAppDelegate();
 private:
