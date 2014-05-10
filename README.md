@@ -45,7 +45,9 @@ by myself. And this engine can not only make STG, but also make other games, rpg
     * WPJPoint
     * WPJSize
     * WPJRectangle
-  ***
+  
+  ---
+
   
   如果对这个项目感兴趣或者是有什么建议，欢迎联系我。
   If you are intresting with this Project or have some suggestions ,welcome to contact me.
