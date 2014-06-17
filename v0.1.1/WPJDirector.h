@@ -23,6 +23,9 @@ class WPJDirector : public WPJObject
 public:
 	static WPJDirector *GetSharedInst();
 
+
+	inline float GetDeltaTime() { return m_fDeltaTime; }
+
 	/**
 	 *	WPJDirector Props
 	 */

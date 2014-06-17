@@ -1,4 +1,8 @@
 #include "WPJAppDelegate.h"
+#include <random>
+
+#include "WPJTest.h"
+#include "WPJIntervalAction.h"
 
 USING_NS_WPJ
 
@@ -77,9 +81,19 @@ int WPJAppDelegate::Run()
 		return 0;
 	}
 
+	/************************************************************************/
+	/* Test Area                                                            */
+	/************************************************************************/
+	WPJNode *node = WPJNodeTest::CreateNewObject();
+	node->SetPosition(WPJPoint(10,5));
+	WPJMoveTo *moveByAction = WPJMoveTo::Create(5, WPJPoint(20,-10));
+	moveByAction->StartWithTarget(node);
+	/************************************************************************/
+	/* Test Area End                                                        */
+	/************************************************************************/
+
 	while (1) 
 	{
-		
 		if ( WPJALGOManager::GetSharedInst()->WaitForEvent(e))
 		{
 			// Event Handle
@@ -103,6 +117,16 @@ int WPJAppDelegate::Run()
 
 			// Run MainLoop
 			WPJDirector::GetSharedInst()->MainLoop();
+
+			// Only For Test
+			moveByAction->Step(WPJDirector::GetSharedInst()->GetDeltaTime());
+			if (!moveByAction->IsDone())
+				WPJLOG("[%s]Node Position (%f, %f)\n",
+					_D_NOW_TIME__,
+					node->GetPosition().x,
+					node->GetPosition().y\
+				);
+
 		}
 		else
 		{
