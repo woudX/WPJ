@@ -80,6 +80,7 @@
 	WPJTPtr<className> *ptrName = new WPJTPtr<className>(dataPtr)
 #define ptr_new(className,ptrName)\
 	WPJTPtr<className> *ptrName = new WPJTPtr<className>()
+#define pp(ptr) (*ptr)
 
 
 /** WPJ_PROPERTY_READONLY is used to declare protected property

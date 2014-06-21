@@ -1,14 +1,17 @@
 #ifndef _H_WPJNODE
 #define _H_WPJNODE
 
-#include "WPJObject.h"
 #include "WPJMacros.h"
+#include "WPJObject.h"
 #include "WPJScheduler.h"
+
 #include "WPJGeometry.h"
 #include "WPJLib.h"
 
 NS_WPJ_BEGIN
 
+class WPJAction;
+class WPJActionManager;
 /**
  *	Brief WPJNode is the core class of all kinds of derived classes, it contains basic draw params and method
 	so that all draw classes is WPJNode.
@@ -183,6 +186,16 @@ public:
 	/// Update
 	virtual void Update(float dt);
 	virtual void CleanUp();
+
+	/// Action
+	/**
+	 *	Action is controlled by WPJActionManager, there is only package the interface 
+	 *	of the WPJActionManager
+	 */
+
+	// Run a action with this unit
+	void RunAction(WPJAction *pAction);
+
 protected:
 	WPJNode();
 
@@ -200,6 +213,7 @@ protected:
 
 	WPJ_PROPERTY(WPJNode*, m_pParent, Parent)
 	WPJ_PROPERTY(WPJScheduler*, m_pScheduler, Scheduler)
+	WPJ_PROPERTY(WPJActionManager*, m_pActionManager, ActionManager)
 	WPJ_PROPERTY(float, m_fRotationX, RotationX)
 	WPJ_PROPERTY(float, m_fRotationY, RotationY)
 	WPJ_PROPERTY(float, m_fScaleX, ScaleX)

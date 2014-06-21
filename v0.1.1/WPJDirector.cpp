@@ -1,5 +1,6 @@
 #include "WPJDirector.h"
 #include "WPJAppDelegate.h"
+#include "WPJActionManager.h"
 USING_NS_WPJ
 
 WPJDirector *WPJDirector::m_pInst = 0;
@@ -34,6 +35,7 @@ WPJALGOManager *WPJDirector::GetALGOManager()
 WPJDirector::WPJDirector()
 :m_pScheduler(WPJScheduler::CreateNewObject())
 ,m_pALGOManager(WPJALGOManager::GetSharedInst())
+,m_pActionManager(WPJActionManager::GetsharedInst())
 ,m_bPause(false)
 ,m_bExit(false)
 ,m_bTimeStart(true)
@@ -168,8 +170,11 @@ void WPJDirector::Draw()
 {
 	CalculateInterval();
 
-	// update
+	// update scheduler
 	m_pScheduler->Update(m_fDeltaTime);
+
+	// update actions
+	m_pActionManager->Update(m_fDeltaTime);
 
 	// draw, using visit()
 	ShowStatus();
@@ -214,12 +219,12 @@ void WPJDirector::SetAnimationInterval(double dValue)
 
 void WPJDirector::StartAnimation()
 {
-
+	
 }
 
 void WPJDirector::StopAnimation()
 {
-
+	
 }
 
 WPJDisplayLinkDirector::WPJDisplayLinkDirector()

@@ -9,6 +9,7 @@
 
 NS_WPJ_BEGIN
 
+class WPJActionManager;
 /**
  *	Brief, WPJDirector is responsible for scene change¡¢pause¡¢resume, flow control, like a director
  *	So WPJDirector contains these kinds of method:
@@ -89,7 +90,8 @@ protected:
 	WPJScene *m_pNextScene;
 	WPJScene *m_pRunningScene;
 
-	WPJ_PROPERTY(WPJScheduler* ,m_pScheduler, Scheduler)
+	WPJActionManager *m_pActionManager;
+	WPJ_PROPERTY(WPJScheduler*, m_pScheduler, Scheduler)
 	WPJ_PROPERTY_READONLY(WPJALGOManager*, m_pALGOManager, ALGOManager)
 private:
 	static WPJDirector *m_pInst;

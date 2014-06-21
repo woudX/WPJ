@@ -56,7 +56,7 @@ bool WPJAction::IsDone()
 
 void WPJAction::StartWithTarget(WPJNode *target)
 {
-	m_pTarget = target;
+	target->GetSharedPtr(m_pTarget);
 }
 
 void WPJAction::SetTag(int var) 

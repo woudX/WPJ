@@ -1,5 +1,6 @@
 #include "WPJNode.h"
 #include "WPJGarbageCollection.h"
+#include "WPJActionManager.h"
 
 USING_NS_WPJ
 
@@ -7,6 +8,7 @@ WPJNode::WPJNode()
 :m_pScheduler(NULL)
 ,m_iTag(INT_MAX)
 ,m_pParent(NULL)
+,m_pActionManager(WPJActionManager::GetsharedInst())
 {
 	
 }
@@ -15,6 +17,7 @@ WPJNode *WPJNode::CreateNewObject()
 {
 	WPJNode *t_pNode = new WPJNode();
 	WPJGC::GetSharedInst()->AddPtr(t_pNode);
+
 	return t_pNode;
 }
 
@@ -62,6 +65,16 @@ void WPJNode::SetScheduler(WPJScheduler* var)
 WPJScheduler *WPJNode::GetScheduler()
 {
 	return m_pScheduler;
+}
+
+void WPJNode::SetActionManager(WPJActionManager* var)
+{
+	m_pActionManager = var;
+}
+
+WPJActionManager *WPJNode::GetActionManager()
+{
+	return m_pActionManager;
 }
 
 float WPJNode::GetRotationX()
@@ -441,6 +454,12 @@ void WPJNode::PauseScheduleAndAction()
 void WPJNode::ResumeScheduleAndAction()
 {
 	m_pScheduler->ResumeTarget(this);
+}
+
+void WPJNode::RunAction(WPJAction *pAction)
+{
+	ASSERT(pAction != NULL);
+	m_pActionManager->AddAction(this, pAction, !m_bIsRunning);
 }
 
 void WPJNode::Update(float dt)
