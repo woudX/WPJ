@@ -2,6 +2,10 @@
 
 USING_NS_WPJ
 
+	
+///	WPJPoint
+//////////////////////////////////////////////////////////////////////////
+
 WPJPoint WPJPoint::zero = WPJPoint(0,0);
 
 WPJPoint::WPJPoint()
@@ -86,6 +90,9 @@ WPJPoint::~WPJPoint()
 
 }
 
+/// WPJSize
+//////////////////////////////////////////////////////////////////////////
+
 WPJSize::WPJSize()
 :width(0.f)
 ,height(0.f)
@@ -159,4 +166,74 @@ bool WPJSize::Equals(const WPJSize &rhs) const
 WPJSize::~WPJSize()
 {
 
+}
+
+/// WPJRect
+//////////////////////////////////////////////////////////////////////////
+
+WPJRect::WPJRect()
+{
+
+}
+
+WPJRect::WPJRect(float x, float y, float width, float height)
+	:origin(WPJPoint(x, y))
+	,size(WPJSize(width, height))
+{
+
+}
+
+void WPJRect::SetRect(float x, float y, float width, float height)
+{
+	origin = WPJPoint(x,y);
+	size = WPJSize(width, height);
+}
+
+float WPJRect::GetMaxX() const
+{
+	return origin.x + size.width;
+}
+
+float WPJRect::GetMinX() const
+{
+	return origin.x;
+}
+
+float WPJRect::GetMaxY() const
+{
+	return origin.y + size.height;
+}
+
+float WPJRect::GetMinY() const
+{
+	return origin.y;
+}
+
+float WPJRect::GetMidX() const
+{
+	return (float)(origin.x + size.width / 2.0);
+}
+
+float WPJRect::GetMidY() const
+{
+	return (float)(origin.y + size.height / 2.0);
+}
+
+bool WPJRect::Equals(const WPJRect& lhs) const
+{
+	return (origin.Equals(lhs.origin) && size.Equals(lhs.size));
+}
+
+bool WPJRect::ContainsPoint(const WPJPoint& point) const
+{
+	return (point.x <= GetMaxX() && point.x >= GetMinX() 
+		&& point.y <= GetMaxY() && point.y >= GetMinY());
+}
+
+bool WPJRect::IntersectRect(const WPJRect& rect) const
+{
+	return (	GetMaxX() > rect.GetMinX() ||
+				GetMinX() < rect.GetMaxX() ||
+				GetMaxY() > rect.GetMinY() ||
+				GetMinY() < rect.GetMaxY());
 }

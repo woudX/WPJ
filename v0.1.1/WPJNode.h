@@ -7,6 +7,7 @@
 
 #include "WPJGeometry.h"
 #include "WPJLib.h"
+#include "WPJProtocols.h"
 
 NS_WPJ_BEGIN
 
@@ -220,8 +221,39 @@ protected:
 	WPJ_PROPERTY(float, m_fScaleY, ScaleY)
 	WPJ_PROPERTY(bool, m_bVisible, Visible)
 private:
-	
-	
+};
+
+class WPJNodeRGBA : public WPJNode, public WPJRGBAProtocol
+{
+public:
+	WPJNodeRGBA();
+	virtual ~WPJNodeRGBA();
+
+	virtual U_CHAR GetDisplayOpacity();
+	virtual void UpdateDisplayOpacity(U_CHAR opacity);
+	virtual U_CHAR GetOpacity();
+	virtual void SetOpacity(U_CHAR opacity);
+
+	virtual const wpColor3B& GetDisplayColor();
+	virtual void UpdateDisplayColor(const wpColor3B& color);
+	virtual const wpColor3B& GetColor();
+	virtual void SetColor(const wpColor3B& color);
+
+	virtual bool IsOpacityModifyRGB();
+	virtual void SetOpacityModifyRGB(bool bValue);
+
+	virtual bool IsCascadeColorEnabled();
+	virtual void SetCascadeColorEnabled(bool bValue);
+	virtual bool IsCascadeOpacityEnabled();
+	virtual void SetCascadeOpacityEnabled(bool bValue);
+
+protected:
+	U_CHAR m_displayOpacity;
+	U_CHAR m_realOpacity;
+	wpColor3B m_displayColor;
+	wpColor3B m_realColor;
+	bool m_bCascadeColorEnabled;
+	bool m_bCascadeOpacityEnabled;
 };
 
 NS_WPJ_END

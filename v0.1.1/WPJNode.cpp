@@ -471,3 +471,86 @@ WPJNode::~WPJNode()
 {
 
 }
+
+/// WPJNodeRGBA
+//////////////////////////////////////////////////////////////////////////
+
+WPJNodeRGBA::WPJNodeRGBA() 
+{
+
+}
+
+U_CHAR WPJNodeRGBA::GetDisplayOpacity()
+{
+	return m_displayOpacity;
+}
+
+void WPJNodeRGBA::UpdateDisplayOpacity(U_CHAR opacity)
+{
+	m_displayOpacity = opacity;
+}
+
+U_CHAR WPJNodeRGBA::GetOpacity()
+{
+	return m_realOpacity;
+}
+
+void WPJNodeRGBA::SetOpacity(U_CHAR opacity)
+{
+	m_realOpacity = opacity;
+}
+
+const wpColor3B& WPJNodeRGBA::GetDisplayColor()
+{
+	return m_displayColor;
+}
+
+void WPJNodeRGBA::UpdateDisplayColor(const wpColor3B& color)
+{
+	m_displayColor = color;
+}
+
+const wpColor3B& WPJNodeRGBA::GetColor()
+{
+	return m_realColor;
+}
+
+void WPJNodeRGBA::SetColor(const wpColor3B& color)
+{
+	m_realColor = color;
+}
+
+bool WPJNodeRGBA::IsOpacityModifyRGB()
+{
+	return false;
+}
+
+void WPJNodeRGBA::SetOpacityModifyRGB(bool bValue)
+{
+	UN_USED_PARAM(bValue);
+}
+
+bool WPJNodeRGBA::IsCascadeColorEnabled()
+{
+	return m_bCascadeColorEnabled;
+}
+
+void WPJNodeRGBA::SetCascadeColorEnabled(bool bValue)
+{
+	m_bCascadeColorEnabled = bValue;
+}
+
+bool WPJNodeRGBA::IsCascadeOpacityEnabled()
+{
+	return m_bCascadeOpacityEnabled;
+}
+
+void WPJNodeRGBA::SetCascadeOpacityEnabled(bool bValue)
+{
+	m_bCascadeOpacityEnabled = bValue;
+}
+
+WPJNodeRGBA::~WPJNodeRGBA()
+{
+
+}

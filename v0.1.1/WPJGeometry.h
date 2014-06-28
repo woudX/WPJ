@@ -165,5 +165,34 @@ public:
 	~WPJSize();
 };
 
+class WPJRect
+{
+public:
+	WPJPoint origin;
+	WPJSize size;
+
+public:
+	WPJRect();
+	WPJRect(float x, float y, float width, float height);
+	WPJRect(const WPJRect& lhs);
+	WPJRect& operator= (const WPJRect& lhs);
+	
+	void SetRect(float x, float y, float width, float height);
+	float GetMinX() const;
+	float GetMaxX() const;
+	float GetMinY() const;
+	float GetMaxY() const;
+	float GetMidX() const;
+	float GetMidY() const;
+	bool Equals(const WPJRect& lhs) const;
+	bool ContainsPoint(const WPJPoint& point) const;
+	bool IntersectRect(const WPJRect& rect) const;
+};
+
+#define _npoint(x,y) WPJPoint((float)(x),(float)(y))
+#define _nsize(width,height) WPJSize((float)(width),(float)(height))
+#define _nRect(x,y,width,height) WPJRect((float)(x),float(y),float(width),float(height))
+
+
 NS_WPJ_END
 #endif

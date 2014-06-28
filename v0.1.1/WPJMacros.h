@@ -45,16 +45,17 @@
 	}\
 	container.clear();
 
-/// 数据结构宏定义
+/// 数据结构定义
 //////////////////////////////////////////////////////////////////////////
-#define U_INT unsigned int
-
+typedef unsigned int U_INT;
+typedef unsigned char U_CHAR;
 #define U_INT_MAX 0xffffffff
 
 #define WPJRepeatForever U_INT_MAX - 1
 
 #define FLT_EPSILON     1.192092896e-07F
 
+#define UN_USED_PARAM(...)
 /// _DEBUG模式
 //////////////////////////////////////////////////////////////////////////
 #ifdef _DEBUG
