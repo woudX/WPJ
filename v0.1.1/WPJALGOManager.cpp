@@ -55,6 +55,8 @@ bool WPJALGOManager::InitALGO()
 	}
 	al_install_mouse();
 	al_install_keyboard();
+	al_init_primitives_addon();
+	al_init_image_addon();
 
 	// Initialize allegro display
 	m_pDisplay = al_create_display(m_obWndSize.width, m_obWndSize.height);

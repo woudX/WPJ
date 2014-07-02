@@ -6,8 +6,6 @@ USING_NS_WPJ
 ///	WPJPoint
 //////////////////////////////////////////////////////////////////////////
 
-WPJPoint WPJPoint::zero = WPJPoint(0,0);
-
 WPJPoint::WPJPoint()
 :x(0.f)
 ,y(0.f)
@@ -34,9 +32,23 @@ WPJPoint WPJPoint::operator+ (const WPJPoint &rhs) const
 	return WPJPoint(x + rhs.x, y + rhs.y);
 }
 
+WPJPoint& WPJPoint::operator+=(const WPJPoint &rhs)
+{
+	x += rhs.x;
+	y += rhs.y;
+	return *this;
+}
+
 WPJPoint WPJPoint::operator- (const WPJPoint &rhs) const
 {
 	return WPJPoint(x - rhs.x, y - rhs.y);
+}
+
+WPJPoint& WPJPoint::operator-= (const WPJPoint &rhs)
+{
+	x -= rhs.x;
+	y -= rhs.y;
+	return *this;
 }
 
 WPJPoint WPJPoint::operator- () const
@@ -82,7 +94,7 @@ WPJPoint WPJPoint::RotateByAngle(const WPJPoint &pivot, float fAngle) const
 
 WPJPoint WPJPoint::RotateByAngle(float fAngle) const
 {
-	return zero + (*this - zero).Rotate(WPJPoint::ForAngle(fAngle));
+	return WPJPointZero + (*this - WPJPointZero).Rotate(WPJPoint::ForAngle(fAngle));
 }
 
 WPJPoint::~WPJPoint()
@@ -181,6 +193,23 @@ WPJRect::WPJRect(float x, float y, float width, float height)
 	,size(WPJSize(width, height))
 {
 
+}
+
+WPJRect::WPJRect(const WPJPoint& obOrigin, const WPJSize& obSize)
+	:origin(obOrigin),size(obSize)
+{
+
+}
+
+WPJRect::WPJRect(const WPJRect& lhs)
+{
+	origin = lhs.origin;
+	size = lhs.size;
+}
+
+WPJRect WPJRect::operator= (const WPJRect& lhs)
+{
+	return WPJRect(lhs.origin, lhs.size);
 }
 
 void WPJRect::SetRect(float x, float y, float width, float height)

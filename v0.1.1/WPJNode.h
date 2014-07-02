@@ -27,12 +27,20 @@ class WPJActionManager;
 	- Setters & Getters for Graphic Properties
 	- Children and Parent	¡Ì
 	- Event Callbacks		¡Ì
-	- Actions
+	- Actions				¡Ì
 	- Scheduler and Timer	¡Ì
 	- Draw					¡Ì
 	- Transformation
 	- Coordinate Converters
  */
+
+enum WPJ_COORDINATE_SYSTEMS {
+	WPJ_COORDINATE_WORLD		= 0,
+	WPJ_COORDINATE_RELATIVE		= 1,
+	WPJ_COORDINATE_ALLEGRO		= 2,
+	WPJ_COORDINATE_NUMS
+};
+
 
 class WPJNode : public WPJObject
 {
@@ -54,7 +62,6 @@ public:
 	 *	These are not all of the getter and setter, some are defined by marco, for example,
 	 *	WPJ_PROPERTY define getter/setter, more detail info can be seen in 'WPJMarcos.h'
 	 */
-	virtual void SetRotation(float fx, float fy);
 	virtual void SetScale(float fx, float fy);
 	virtual void SetPosition(float fx, float fy);
 	virtual void SetAnchorPoint(float fx, float fy);
@@ -70,7 +77,7 @@ public:
 	 *	- OnExitTransitionDidStart
 	 */
 
-	// If this node enter the "stage", this event will be called automatically[
+	// If this node enter the "stage", this event will be called automatically
 	// While the event running, you can access 'brothers/sisters' by parents pointer
 	virtual void OnEnter();
 
@@ -141,6 +148,13 @@ public:
 	// Visits this node's children and draw them recursively
 	virtual void Visit();
 
+	//	After ignore anchor point, node's final position will only consider position but not 
+	//	position && anchor point
+	//	The default is false, but it always be true on WPJLayer because Layer needn't to consider
+	//	anchor point, the position(0, 0) can decide where to draw
+	void SetIgnoreAnchorPoint(bool bValue);
+	bool IsIgnoreAnchorPoint();
+
 	/// Scheduler And Timer
 	/**
 	 *	WPJNode contain a scheduler class therefore it only packaged Scheduler's interfaces but 
@@ -197,6 +211,27 @@ public:
 	// Run a action with this unit
 	void RunAction(WPJAction *pAction);
 
+	/// Coordinate Convertion
+	/**
+	 *	In WPJ, there are 3 kinds of coordinate systems, they are:
+	 *	WPJ_COORDINATE_WORLD	: discript node position in real world
+	 *	WPJ_COORDINATE_RELATIVE : discript node position in relative system
+	 *	WPJ_COORDINATE_ALLEGRO	: discript node position in allegro system
+	 *
+	 *	We provide these methods to transform coordinate:
+	 *				WPJ_COORDINATE_RELATIVE	->	WPJ_COORDINATE_WORLD
+	 *				WPJ_COORDINATE_RELATIVE ->	WPJ_COORDINATE_ALLEGRO
+	 *				WPJ_COORDINATE_WORLD	->	WPJ_COORDINATE_ALLEGRO - NO_USE
+	 *				
+	 */
+
+	//	Convert node's coordinate system from relative to world
+	WPJPoint RelativeConvertToWorld();
+
+	//	Convert node's coordinate system from relative to allegro system
+	//	Usually, it's used for drawing
+	WPJPoint RelativeConvertToAllegro();
+
 protected:
 	WPJNode();
 
@@ -204,22 +239,27 @@ protected:
 	int m_iTag;
 	bool m_bIsRunning;
 
-	
+	// If anchor point is ignored , the final position will only consider position
+	bool m_bIgnoreAnchorPoint;
+
 	void DetachChild(WPJNode *p_pChild, bool p_bCleanup);
 
 	std::list<WPJNode* > m_lChildList;
-	
-	WPJ_PROPERTY_BY_REF(WPJPoint, m_obAnchorPoint, AnchorPoint)
-	WPJ_PROPERTY_BY_REF(WPJPoint, m_obPosition, Position)
+	WPJ_PROPERTY(U_CHAR, m_ucCoordinateSystem, CoordinateSystem)
+	WPJ_PROPERTY_BY_REF(WPJPoint, m_obAnchorPoint, AnchorPoint)		// transition center, default (0.5, 0.5)
+	WPJ_PROPERTY_BY_REF(WPJPoint, m_obPosition, Position)			// position
 
-	WPJ_PROPERTY(WPJNode*, m_pParent, Parent)
+	WPJ_PROPERTY(WPJNode*, m_pParent, Parent)                                                                                                                               
 	WPJ_PROPERTY(WPJScheduler*, m_pScheduler, Scheduler)
 	WPJ_PROPERTY(WPJActionManager*, m_pActionManager, ActionManager)
-	WPJ_PROPERTY(float, m_fRotationX, RotationX)
-	WPJ_PROPERTY(float, m_fRotationY, RotationY)
 	WPJ_PROPERTY(float, m_fScaleX, ScaleX)
 	WPJ_PROPERTY(float, m_fScaleY, ScaleY)
 	WPJ_PROPERTY(bool, m_bVisible, Visible)
+	
+	
+	WPJ_PROPERTY_BY_REF(WPJRect, m_obRegion, Region)						// region, default (0, 0, 0, 0) - show all
+	WPJ_PROPERTY(float, m_fAngle, Angle)							// rotate, default 0
+	
 private:
 };
 
@@ -248,10 +288,10 @@ public:
 	virtual void SetCascadeOpacityEnabled(bool bValue);
 
 protected:
-	U_CHAR m_displayOpacity;
-	U_CHAR m_realOpacity;
-	wpColor3B m_displayColor;
-	wpColor3B m_realColor;
+	U_CHAR m_displayOpacity;	//	tint opacity
+	U_CHAR m_realOpacity;		//	selfopacity
+	wpColor3B m_displayColor;	//	tint color
+	wpColor3B m_realColor;		//	self color
 	bool m_bCascadeColorEnabled;
 	bool m_bCascadeOpacityEnabled;
 };

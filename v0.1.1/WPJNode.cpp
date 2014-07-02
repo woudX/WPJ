@@ -1,16 +1,26 @@
 #include "WPJNode.h"
 #include "WPJGarbageCollection.h"
 #include "WPJActionManager.h"
+#include "WPJDirector.h"
 
 USING_NS_WPJ
 
 WPJNode::WPJNode()
-:m_pScheduler(NULL)
-,m_iTag(INT_MAX)
-,m_pParent(NULL)
-,m_pActionManager(WPJActionManager::GetsharedInst())
+	:m_pScheduler(WPJDirector::GetSharedInst()->GetScheduler())
+	,m_iTag(INT_MAX)
+	,m_pParent(NULL)
+	,m_pActionManager(WPJActionManager::GetsharedInst())
+	,m_obAnchorPoint(0.5, 0.5)
+	,m_fScaleX(1.0)
+	,m_fScaleY(1.0)
+	,m_obPosition(_npoint(0,0))
+	,m_fAngle(0)
+	,m_ucCoordinateSystem(WPJ_COORDINATE_WORLD)
+	,m_obRegion(WPJRectZero)
+	,m_bVisible(true)
+	,m_bIgnoreAnchorPoint(false)
 {
-	
+
 }
 
 WPJNode *WPJNode::CreateNewObject()
@@ -77,32 +87,6 @@ WPJActionManager *WPJNode::GetActionManager()
 	return m_pActionManager;
 }
 
-float WPJNode::GetRotationX()
-{
-	return m_fRotationX;
-}
-
-void WPJNode::SetRotationX(float var)
-{
-	m_fRotationX = var;
-}
-
-float WPJNode::GetRotationY()
-{
-	return m_fRotationY;
-}
-
-void WPJNode::SetRotationY(float var)
-{
-	m_fRotationY = var;
-}
-
-void WPJNode::SetRotation(float fx, float fy)
-{
-	m_fRotationX = fx;
-	m_fRotationY = fy;
-}
-
 float WPJNode::GetScaleX()
 {
 	return m_fScaleX;
@@ -127,6 +111,16 @@ void WPJNode::SetScale(float fx, float fy)
 {
 	m_fScaleX = fx;
 	m_fScaleY = fy;
+}
+
+void WPJNode::SetRegion(WPJRect var)
+{
+	m_obRegion = var;
+}
+
+WPJRect &WPJNode::GetRegion()
+{
+	return m_obRegion;
 }
 
 void WPJNode::SetPosition(WPJPoint var)
@@ -169,6 +163,16 @@ void WPJNode::SetVisible(bool var)
 bool WPJNode::GetVisible()
 {
 	return m_bVisible;
+}
+
+float WPJNode::GetAngle()
+{
+	return m_fAngle;
+}
+
+void WPJNode::SetAngle(float var)
+{
+	m_fAngle = var;
 }
 
 bool WPJNode::IsRunning()
@@ -256,8 +260,8 @@ void WPJNode::AddChild(WPJNode *p_pChild, int p_izOrder, int p_iTag)
 	if (m_bIsRunning)
 	{
 		// call OnEnter and OnEnterTransitionDidFinish
-		pSharedChild->OnEnter();
-		pSharedChild->OnEnterTransitionDidFinish();
+		// pSharedChild->OnEnter();
+		// pSharedChild->OnEnterTransitionDidFinish();
 	}
 }
 
@@ -406,6 +410,16 @@ void WPJNode::Visit()
 	}
 }
 
+void WPJNode::SetIgnoreAnchorPoint(bool bValue)
+{
+	m_bIgnoreAnchorPoint = bValue;
+}
+
+bool WPJNode::IsIgnoreAnchorPoint()
+{
+	return m_bIgnoreAnchorPoint;
+}
+
 void WPJNode::Schedule(SEL_SCHEDULE pfnSelector)
 {
 	m_pScheduler->ScheduleSelector(this, pfnSelector, 0, !m_bIsRunning);
@@ -467,6 +481,45 @@ void WPJNode::Update(float dt)
 
 }
 
+U_CHAR WPJNode::GetCoordinateSystem()
+{
+	return m_ucCoordinateSystem;
+}
+
+void WPJNode::SetCoordinateSystem(U_CHAR var)
+{
+	m_ucCoordinateSystem = var;
+}
+
+WPJPoint WPJNode::RelativeConvertToWorld()
+{
+	WPJPoint t_obWorldPoint = WPJPointZero;
+
+	// if this node's coordinate is relative , calculate and return world coordinate
+	// else return origin position or WPJPositionZero
+
+	if (m_ucCoordinateSystem == WPJ_COORDINATE_RELATIVE)
+	{
+		t_obWorldPoint = m_obPosition;
+
+		if (m_pParent != NULL)
+			t_obWorldPoint += m_pParent->RelativeConvertToWorld();
+	}
+	else if (m_ucCoordinateSystem == WPJ_COORDINATE_WORLD)
+	{
+		t_obWorldPoint = m_obPosition;
+	}
+	else
+	{
+		WPJLOG("[%s] There is no valid transform from WPJ_COORDINATE_ALLEGRO to WPJ_COORDINATE_WORLD"
+			, _D_NOW_TIME__);
+	}
+
+	return t_obWorldPoint;
+}
+
+
+
 WPJNode::~WPJNode()
 {
 
@@ -475,7 +528,12 @@ WPJNode::~WPJNode()
 /// WPJNodeRGBA
 //////////////////////////////////////////////////////////////////////////
 
-WPJNodeRGBA::WPJNodeRGBA() 
+WPJNodeRGBA::WPJNodeRGBA()
+	:m_displayColor(wpc3(255,255,255))
+	,m_displayOpacity(255)
+	,m_bCascadeColorEnabled(false)
+	,m_bCascadeOpacityEnabled(false)
+
 {
 
 }

@@ -3,6 +3,7 @@
 
 #include "WPJStdafx.h"
 #include "WPJMacros.h"
+#include "WPJTexture2D.h"
 #include "WPJTypes.h"
 
 NS_WPJ_BEGIN
@@ -61,7 +62,8 @@ public:
 class WPJTextureProtocol : public WPJBlendProtocol
 {
 public:
-	virtual void SetTexture() = 0;
+	virtual void SetTexture(WPJTexture2D *texture) = 0;
+	virtual WPJTexture2D *GetTexture() = 0;
 };
 
 NS_WPJ_END

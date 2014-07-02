@@ -9,7 +9,8 @@
 
 #include <allegro5/allegro.h>
 #include <allegro5/blender.h>
-
+#include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_image.h>
 NS_WPJ_BEGIN
 
 enum WPJ_BLEND_MODE
@@ -31,6 +32,13 @@ enum WPJ_BLEND_OPERATIONS
 	AL_FUNC_SRC_MINUS_DEST		= ALLEGRO_SRC_MINUS_DEST,
 	AL_FUNC_DEST_MINUS_SRC		= ALLEGRO_DEST_MINUS_SRC,
 	AL_FUNC_NUM_BLEND_OPERATIONS
+};
+
+enum WPJ_DRAW_FLAGS
+{
+	AL_FLIP_HORIZONTAL			= ALLEGRO_FLIP_HORIZONTAL,
+	AL_FLIP_VERTICAL			= ALLEGRO_FLIP_VERTICAL,
+	AL_DRAW_FLAGS_MODES
 };
 
 class WPJALGOManager

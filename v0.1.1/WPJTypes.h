@@ -39,6 +39,12 @@ public:
 
 #define def_blend wpBlendFunc(AL_FUNC_ADD, AL_SRC_ALPHA, AL_ONE_MINUS_SRC_ALPHA)
 #define new_blend(func,src,dest) wpBlendFunc(func, src, dest)
+static inline wpBlendFunc wpbf3(const U_CHAR ucFunc, const U_CHAR ucSrc, const U_CHAR ucDest)
+{
+	wpBlendFunc bf(ucFunc, ucSrc, ucDest);
+	return bf;
+}
+
 
 NS_WPJ_END
 

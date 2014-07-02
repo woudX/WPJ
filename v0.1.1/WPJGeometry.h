@@ -22,7 +22,10 @@ public:
 	WPJPoint(const WPJPoint &rhs);
 
 	WPJPoint operator + (const WPJPoint &rhs) const;
+	WPJPoint &operator +=(const WPJPoint &rhs) ;
 	WPJPoint operator - (const WPJPoint &rhs) const;
+	WPJPoint &operator -=(const WPJPoint &rhs) ;
+
 	WPJPoint operator - () const;
 
 	WPJPoint operator * (float ft) const;
@@ -138,9 +141,6 @@ public:
 	}
 	
 	~WPJPoint();
-
-	// Static Rotates (0,0)
-	static WPJPoint zero;
 };
 
 class WPJSize
@@ -174,8 +174,9 @@ public:
 public:
 	WPJRect();
 	WPJRect(float x, float y, float width, float height);
+	WPJRect(const WPJPoint& obOrigin, const WPJSize& obSize);
 	WPJRect(const WPJRect& lhs);
-	WPJRect& operator= (const WPJRect& lhs);
+	WPJRect operator= (const WPJRect& lhs);
 	
 	void SetRect(float x, float y, float width, float height);
 	float GetMinX() const;
@@ -193,6 +194,9 @@ public:
 #define _nsize(width,height) WPJSize((float)(width),(float)(height))
 #define _nRect(x,y,width,height) WPJRect((float)(x),float(y),float(width),float(height))
 
+static WPJPoint WPJPointZero = _npoint(0,0);
+static WPJSize WPJPointSize = _nsize(0,0);
+static WPJRect WPJRectZero = _nRect(0,0,0,0);
 
 NS_WPJ_END
 #endif
