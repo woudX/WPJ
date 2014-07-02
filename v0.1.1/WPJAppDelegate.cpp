@@ -22,11 +22,16 @@ WPJAppDelegate::WPJAppDelegate()
 
 }
 
-void WPJAppDelegate::SetAnimationInterval(double interval)
+void WPJAppDelegate::SetAnimationInterval(double dValue)
 {
 	LARGE_INTEGER t_obFreq;
 	QueryPerformanceFrequency(&t_obFreq);
-	m_liAnimationInterval.QuadPart = static_cast<LONGLONG>(t_obFreq.QuadPart * interval);
+	m_liAnimationInterval.QuadPart = static_cast<LONGLONG>(t_obFreq.QuadPart * dValue);
+}
+
+bool WPJAppDelegate::ApplicationDidFinishLaunching()
+{
+	return Initialization();
 }
 
 bool WPJAppDelegate::Initialization()
@@ -44,7 +49,10 @@ bool WPJAppDelegate::Initialization()
 	}	
 	
 	// Init ALGO
-	if (!WPJALGOManager::GetSharedInst()->InitALGO())
+	// Set application resolution and policy 
+	WPJALGOManager *t_pALGOManager = WPJALGOManager::GetSharedInst();
+	t_pALGOManager->SetDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, wResolutionNoBorder);
+	if (!t_pALGOManager->InitALGO())
 	{
 		WPJLOG("[%s] WPJAppDelegate ... error in InitALGO\n", _D_NOW_TIME__);
 		return false;
@@ -61,8 +69,6 @@ bool WPJAppDelegate::Initialization()
 bool WPJAppDelegate::ExtendInit()
 {
 	WPJALGOManager *t_pALGOMgr = WPJALGOManager::GetSharedInst();
-
-	t_pALGOMgr->SetWndSize(800, 600);
 	t_pALGOMgr->SetWndName(HString("测试窗口"));
 
 	return true;
@@ -76,7 +82,7 @@ int WPJAppDelegate::Run()
 
 	QueryPerformanceCounter(&t_obLILast);
 
-	if (!Initialization())
+	if (!ApplicationDidFinishLaunching())
 	{
 		WPJLOG("[%s] Error ... WPJAppDelegation init failed!\n", _D_NOW_TIME__);
 		return 0;
@@ -90,23 +96,23 @@ int WPJAppDelegate::Run()
 	WPJMoveTo *moveByAction = WPJMoveTo::Create(5, WPJPoint(300,500));
 	WPJSprite *sprite = WPJSprite::Create();
 	sprite->InitWithFile("white.png");
-	sprite->SetPosition(WPJPoint(100,50));
+	sprite->SetPosition(WPJPoint(100, 50));
 	sprite->RunAction(moveByAction);
 
 	// 初始化精灵2
 	WPJMoveTo *moveByAction_2 = WPJMoveTo::Create(5, WPJPoint(400, -50));
 	WPJSprite *sprite_2 = WPJSprite::Create();
 	sprite_2->InitWithFile("white.png");
-	sprite_2->UpdateDisplayColor(wpColor3B(255,0,0));
+	sprite_2->UpdateDisplayColor(wpColor3B(255, 0, 0));
 	sprite_2->SetCoordinateSystem(WPJ_COORDINATE_RELATIVE);
-	sprite_2->SetPosition(WPJPoint(100,50));
+	sprite_2->SetPosition(WPJPoint(100, 50));
 	sprite_2->RunAction(moveByAction_2);
 	sprite->AddChild(sprite_2);
 
 	/************************************************************************/
 	/* Test Area End                                                        */
 	/************************************************************************/
-
+	float t2 = 0;
 	while (1) 
 	{
 		if ( WPJALGOManager::GetSharedInst()->WaitForEvent(e))

@@ -12,8 +12,7 @@ WPJALGOManager *WPJALGOManager::GetSharedInst()
 }
 
 WPJALGOManager::WPJALGOManager()
-:m_obWndSize(WPJSize(640, 480))
-,m_obWndName("WPJEngineTest")
+:m_obWndName("WPJEngineTest")
 ,m_pDisplay(NULL)
 {
 
@@ -27,22 +26,6 @@ void WPJALGOManager::SetWndName(HString var)
 HString &WPJALGOManager::GetWndName()
 {
 	return m_obWndName;
-}
-
-void WPJALGOManager::SetWndSize(WPJSize var)
-{
-	m_obWndSize = var;
-}
-
-void WPJALGOManager::SetWndSize(int width, int height)
-{
-	m_obWndSize.width = width;
-	m_obWndSize.height = height;
-}
-
-WPJSize &WPJALGOManager::GetWndSize()
-{
-	return m_obWndSize;
 }
 
 bool WPJALGOManager::InitALGO()
@@ -59,7 +42,7 @@ bool WPJALGOManager::InitALGO()
 	al_init_image_addon();
 
 	// Initialize allegro display
-	m_pDisplay = al_create_display(m_obWndSize.width, m_obWndSize.height);
+	m_pDisplay = al_create_display(m_obScreenSize.width, m_obScreenSize.height);
 	if (!m_pDisplay)
 	{
 		WPJLOG("[%s] Error in %s(%s) ... Failed to create display\n", _D_NOW_TIME__, __FILE__, __LINE__);

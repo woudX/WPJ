@@ -1,8 +1,8 @@
 #ifndef _H_WPJMACROS
 #define _H_WPJMACROS
 
-#include <assert.h>
-#include <iostream>
+#include "WPJStdC.h"
+
 
 #define NS_WPJ_BEGIN	namespace wpj_engine {
 #define NS_WPJ_END		}

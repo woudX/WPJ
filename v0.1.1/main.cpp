@@ -26,6 +26,8 @@ int main(int argc, char **argv)
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
 
+	// Set frame resolution
+	WPJALGOManager::GetSharedInst()->SetFrameSize(800, 600);
 	return WPJAppDelegate::GetSharedInst()->Run();	
 }
 

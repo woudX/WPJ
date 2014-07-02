@@ -6,7 +6,7 @@
 #include "WPJGeometry.h"
 #include "WPJString.h"
 #include "WPJLib.h"
-
+#include "WPJALGOProtocol.h"
 #include <allegro5/allegro.h>
 #include <allegro5/blender.h>
 #include <allegro5/allegro_primitives.h>
@@ -41,10 +41,9 @@ enum WPJ_DRAW_FLAGS
 	AL_DRAW_FLAGS_MODES
 };
 
-class WPJALGOManager
+class WPJALGOManager : public WPJALGOProtocol
 {
 public:
-	WPJ_PROPERTY_BY_REF(WPJSize,m_obWndSize,WndSize)
 	WPJ_PROPERTY_BY_REF(HString,m_obWndName,WndName)
 
 	/// Getter And Setter
