@@ -114,6 +114,7 @@ int WPJAppDelegate::Run()
 	sprite_2->SetPosition(WPJPoint(origin.x + 75, origin.y + 75));
 	sprite_2->RunAction(moveByAction_2);
 
+
 	// ³õÊ¼»¯±³¾°Í¼Æ¬¾«Áé
 	WPJSprite *background = WPJSprite::Create();
 	background->InitWithFile("background.png");
