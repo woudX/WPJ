@@ -28,6 +28,8 @@ int main(int argc, char **argv)
 
 	// Set frame resolution
 	WPJALGOManager::GetSharedInst()->SetFrameSize(800, 600);
+
+	WPJALGOManager::GetSharedInst()->SetFrameZoomFactor(1.20);
 	return WPJAppDelegate::GetSharedInst()->Run();	
 }
 

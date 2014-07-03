@@ -69,6 +69,10 @@ public:
 	// This method will be called every frame, so don't call it manually
 	virtual void Draw();
 
+	WPJPoint GetViewOriginPoint();	
+	WPJSize GetViewSize();
+	WPJSize GetDrawOffset();
+
 protected:
 	WPJDirector();
 

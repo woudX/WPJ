@@ -13,7 +13,7 @@
 
 //	if you want to change resolution, please modify TARGET_DESIGN_RESOLUTION value
 //	and you can set your own resolution by modify DESIGN_RESOLUTION_CUSTOM value
-#define TARGET_DESIGN_RESOLUTION	DESIGN_RESOLUTION_1024X768
+#define TARGET_DESIGN_RESOLUTION	DESIGN_RESOLUTION_800X600
 
 #if (TARGET_DESIGN_RESOLUTION == DESIGN_RESOLUTION_800X600)
 static wpj_engine::WPJSize designResolutionSize = wpj_engine::WPJSize(800, 600);

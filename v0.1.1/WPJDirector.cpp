@@ -227,6 +227,21 @@ void WPJDirector::StopAnimation()
 	
 }
 
+WPJPoint WPJDirector::GetViewOriginPoint()
+{
+	return m_pALGOManager->GetViewOriginPoint();
+}
+
+WPJSize WPJDirector::GetViewSize()
+{
+	return m_pALGOManager->GetViewSize();
+}
+
+WPJSize WPJDirector::GetDrawOffset()
+{
+	return m_pALGOManager->GetDrawOffset();
+}
+
 WPJDisplayLinkDirector::WPJDisplayLinkDirector()
 	:m_bInvalid(false)
 {

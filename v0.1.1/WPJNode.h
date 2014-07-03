@@ -246,9 +246,6 @@ protected:
 
 	std::list<WPJNode* > m_lChildList;
 	WPJ_PROPERTY(U_CHAR, m_ucCoordinateSystem, CoordinateSystem)
-	WPJ_PROPERTY_BY_REF(WPJPoint, m_obAnchorPoint, AnchorPoint)		// transition center, default (0.5, 0.5)
-	WPJ_PROPERTY_BY_REF(WPJPoint, m_obPosition, Position)			// position
-
 	WPJ_PROPERTY(WPJNode*, m_pParent, Parent)                                                                                                                               
 	WPJ_PROPERTY(WPJScheduler*, m_pScheduler, Scheduler)
 	WPJ_PROPERTY(WPJActionManager*, m_pActionManager, ActionManager)
@@ -256,8 +253,9 @@ protected:
 	WPJ_PROPERTY(float, m_fScaleY, ScaleY)
 	WPJ_PROPERTY(bool, m_bVisible, Visible)
 	
-	
-	WPJ_PROPERTY_BY_REF(WPJRect, m_obRegion, Region)						// region, default (0, 0, 0, 0) - show all
+	WPJ_PROPERTY_BY_REF(WPJPoint, m_obAnchorPoint, AnchorPoint)		// transition center, default (0.5, 0.5)
+	WPJ_PROPERTY_BY_REF(WPJPoint, m_obPosition, Position)			// position
+	WPJ_PROPERTY_BY_REF(WPJRect, m_obRegion, Region)				// region, default (0, 0, 0, 0) - show all
 	WPJ_PROPERTY(float, m_fAngle, Angle)							// rotate, default 0
 	
 private:

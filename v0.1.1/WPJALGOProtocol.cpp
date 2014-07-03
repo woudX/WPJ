@@ -6,6 +6,7 @@ WPJALGOProtocol::WPJALGOProtocol()
 :m_obResolutionPolicy(wResolutionUnknown)
 ,m_fScaleX(1.0f)
 ,m_fScaleY(1.0f)
+,m_fFrameZoomFactor(1.0f)
 {
 
 }
@@ -40,7 +41,7 @@ WPJSize &WPJALGOProtocol::GetFrameSize()
 	return m_obScreenSize;
 }
 
-WPJSize &WPJALGOProtocol::GetResolutionSize()
+WPJSize &WPJALGOProtocol::GetDesignResolutionSize()
 {
 	
 	return m_obDesignResolutionSize;
@@ -53,7 +54,7 @@ void WPJALGOProtocol::SetDesignResolutionSize(float width, float height, Resolut
 	m_obDesignResolutionSize.SetSize(width, height);
 
 	m_fScaleX = (float)m_obScreenSize.width / m_obDesignResolutionSize.width;
-	m_fScaleY = (float)m_obScreenSize.height / m_obDesignResolutionSize.width;
+	m_fScaleY = (float)m_obScreenSize.height / m_obDesignResolutionSize.height;
 
 	// decide to select which scale
 	if (resolutionPolicy == wResolutionNoBorder)
@@ -74,6 +75,48 @@ void WPJALGOProtocol::SetDesignResolutionSize(float width, float height, Resolut
 		fViewPortW, fViewPortH);
 
 	m_obResolutionPolicy = resolutionPolicy;
+}
+
+WPJPoint WPJALGOProtocol::GetViewOriginPoint()
+{
+	if (false && m_obResolutionPolicy == wResolutionNoBorder)
+	{
+		return _npoint((m_obDesignResolutionSize.width - m_obScreenSize.height / m_fScaleX) / 2,
+			(m_obDesignResolutionSize.height - m_obScreenSize.height / m_fScaleY) / 2);
+	}
+	else
+	{
+		return WPJPointZero;
+	}
+	
+}
+
+WPJSize WPJALGOProtocol::GetViewSize()
+{
+	if (false && m_obResolutionPolicy == wResolutionNoBorder)
+	{
+		return _nsize(m_obScreenSize.width/ m_fScaleX, m_obScreenSize.height / m_fScaleY);
+	}
+	else
+	{
+		return m_obDesignResolutionSize;
+	}
+}
+
+WPJSize WPJALGOProtocol::GetDrawOffset()
+{
+	return WPJSize(m_obViewPortRect.origin);
+}
+
+void WPJALGOProtocol::SetFrameZoomFactor(float var)
+{
+	m_fFrameZoomFactor = var;
+	SetFrameSize(m_obScreenSize.width * var, m_obScreenSize.height * var);
+}
+
+float WPJALGOProtocol::GetFrameZoomFactor()
+{
+	return m_fFrameZoomFactor;
 }
 
 WPJALGOProtocol::~WPJALGOProtocol()

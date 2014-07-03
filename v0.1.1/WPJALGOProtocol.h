@@ -26,11 +26,26 @@ public:
 	WPJALGOProtocol();
 	~WPJALGOProtocol();
 
+	//	Setting frame size, this size is window/screen resolution
 	WPJSize& GetFrameSize();
 	void SetFrameSize(float width, float height);
 
-	WPJSize& GetResolutionSize();
+	//	Setting resolution size, this size is design resolution
+	WPJSize& GetDesignResolutionSize();
 	void SetDesignResolutionSize(float width, float height, ResolutionPolicy resolutionPolicy);
+
+	//	This origin point is the origin in design resolution, usually is (0, 0)
+	//	but sometimes, in NoBorder policy , origin always not (0, 0)
+	WPJPoint GetViewOriginPoint();
+
+	//	This size is the actually can be seen, in design resolution, usually is resolutionSize
+	//	but sometimes, in NoBorder policy, the size always less than resolutionSize because
+	//	some of content is show outbound
+	WPJSize GetViewSize();
+
+	//	When Screen resolution is not fit with design resolution, we need use draw offset to 
+	//	revise draw position
+	WPJSize GetDrawOffset();
 
 protected:
 	
@@ -38,6 +53,7 @@ protected:
 	WPJSize m_obDesignResolutionSize;		// Design resolution size
 	WPJRect m_obViewPortRect;				// View port rect
 
+	WPJ_PROPERTY(float, m_fFrameZoomFactor, FrameZoomFactor)
 	WPJ_PROPERTY(float, m_fScaleX, ScaleX)
 	WPJ_PROPERTY(float, m_fScaleY, ScaleY)
 

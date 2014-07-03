@@ -51,7 +51,7 @@ bool WPJAppDelegate::Initialization()
 	// Init ALGO
 	// Set application resolution and policy 
 	WPJALGOManager *t_pALGOManager = WPJALGOManager::GetSharedInst();
-	t_pALGOManager->SetDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, wResolutionNoBorder);
+	t_pALGOManager->SetDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, wResolutionShowAll);
 	if (!t_pALGOManager->InitALGO())
 	{
 		WPJLOG("[%s] WPJAppDelegate ... error in InitALGO\n", _D_NOW_TIME__);
@@ -69,6 +69,7 @@ bool WPJAppDelegate::Initialization()
 bool WPJAppDelegate::ExtendInit()
 {
 	WPJALGOManager *t_pALGOMgr = WPJALGOManager::GetSharedInst();
+
 	t_pALGOMgr->SetWndName(HString("测试窗口"));
 
 	return true;
@@ -91,28 +92,41 @@ int WPJAppDelegate::Run()
 	/************************************************************************/
 	/* Test Area                                                            */
 	/************************************************************************/
+	WPJDirector *pDirector = WPJDirector::GetSharedInst();
+	WPJPoint origin = pDirector->GetViewOriginPoint();
+	WPJSize size = pDirector->GetViewSize();
 
 	// 初始化精灵1
-	WPJMoveTo *moveByAction = WPJMoveTo::Create(5, WPJPoint(300,500));
+	WPJMoveTo *moveByAction = WPJMoveTo::Create(5, WPJPoint(WPJDirector::GetSharedInst()->GetViewSize().width - 75,WPJDirector::GetSharedInst()->GetViewSize().height - 75));
 	WPJSprite *sprite = WPJSprite::Create();
 	sprite->InitWithFile("white.png");
-	sprite->SetPosition(WPJPoint(100, 50));
+	sprite->SetPosition(75, 75);
 	sprite->RunAction(moveByAction);
 
 	// 初始化精灵2
-	WPJMoveTo *moveByAction_2 = WPJMoveTo::Create(5, WPJPoint(400, -50));
+	WPJMoveTo *moveByAction_2 = WPJMoveTo::Create(5, WPJPoint(origin.x + size.width - 75, origin.y + 75));
 	WPJSprite *sprite_2 = WPJSprite::Create();
 	sprite_2->InitWithFile("white.png");
-	sprite_2->UpdateDisplayColor(wpColor3B(255, 0, 0));
+	sprite_2->UpdateDisplayOpacity(100);
+	sprite_2->UpdateDisplayColor(wpColor3B(255, 255, 0));
 	sprite_2->SetCoordinateSystem(WPJ_COORDINATE_RELATIVE);
-	sprite_2->SetPosition(WPJPoint(100, 50));
+	sprite_2->SetBlendFunc(new_blend(AL_FUNC_ADD, AL_SRC_ALPHA, AL_SRC_COLOR));
+	sprite_2->SetPosition(WPJPoint(origin.x + 75, origin.y + 75));
 	sprite_2->RunAction(moveByAction_2);
-	sprite->AddChild(sprite_2);
+
+	// 初始化背景图片精灵
+	WPJSprite *background = WPJSprite::Create();
+	background->InitWithFile("background.png");
+	// background->SetIgnoreAnchorPoint(true);
+	background->SetPosition(origin.x + size.width / 2, origin.y + size.height / 2);
+	background->UpdateDisplayColor(wpc3(100, 100, 100));
+	background->SetScale(size.width / 800, size.height / 600);
 
 	/************************************************************************/
 	/* Test Area End                                                        */
 	/************************************************************************/
 	float t2 = 0;
+	bool bPause = false;
 	while (1) 
 	{
 		if ( WPJALGOManager::GetSharedInst()->WaitForEvent(e))
@@ -125,6 +139,8 @@ int WPJAppDelegate::Run()
 					Exit();
 					break;
 				}
+				else if (e.keyboard.keycode == ALLEGRO_KEY_ENTER)
+					bPause = !bPause;
 				else
 					WPJLOG("[%s] 从键盘输入 ... %d\n", _D_NOW_TIME__, e.keyboard.keycode);
 		}
@@ -139,19 +155,30 @@ int WPJAppDelegate::Run()
 			// Run MainLoop
 			WPJDirector::GetSharedInst()->MainLoop();
 
+			// Only For Test
+			//////////////////////////////////////////////////////////////////////////
 			al_clear_to_color(al_map_rgb_f(0,0,0));
+
+			// background
+			/*
+			al_draw_filled_rectangle(
+				WPJDirector::GetSharedInst()->GetViewOriginPoint().x,
+				WPJDirector::GetSharedInst()->GetViewOriginPoint().y,
+				WPJDirector::GetSharedInst()->GetViewOriginPoint().x + WPJDirector::GetSharedInst()->GetViewSize().width,
+				WPJDirector::GetSharedInst()->GetViewOriginPoint().y + WPJDirector::GetSharedInst()->GetViewSize().height,
+				al_map_rgb(100,100,100));
+				*/
+			background->Draw();
 			sprite->Draw();
 			sprite_2->Draw();
 			al_flip_display();
 
-			// Only For Test
-			/*
 			if (!moveByAction->IsDone())
 				WPJLOG("[%s]Node Position (%f, %f)\n",
 					_D_NOW_TIME__,
 					sprite->GetPosition().x,
 					sprite->GetPosition().y\
-				);*/
+				);
 		}
 		else
 		{
