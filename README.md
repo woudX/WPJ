@@ -21,7 +21,7 @@ by myself. And this engine can not only make STG, but also make other games, rpg
       * Object Pool Manager
     + String
       * Hash Compare
-      * String Manager (Working ...)
+      * String Manager
   + Flow Control
     * WPJTimer
     * WPJScheduler
@@ -30,17 +30,36 @@ by myself. And this engine can not only make STG, but also make other games, rpg
   + Allegro Engine - WPJALGO
     * Window Interface
     * Event Interface
-    * Drawing Interface (Working ...)
+    * Drawing Interface
+    * WPJTexture2D
+  + Action
+    * WPJActionManager
+    + Actions
+      + FiniteAction
+        * WPJMoveTo
+        * WPJMoveBy
+        * ...
   + Drawing Tree
     + WPJLayer (Working ...)
-    + WPJScene (Working ...)
+    + WPJScene
+    + WPJSprite
+      * Basic properties
+      + Coordinate System
+        * Relative Coordinate
+        * World Coordinate
+        * Allegro Coordinate
+        * Coordinate Transition
     + WPJNode
       * Children and Parent
       * Event Callbacks
-      * Actions (Working ...)
+      + Actions
       * Scheduler and Timer
-      * Draw (Working ...)
-      * Transformation (Working ...)
+      * Draw
+      + Transformation
+        * Rotate
+        * Scale
+        * Transition
+        * Skew  (Working ...)
   + Math Geometry
     * WPJPoint
     * WPJSize
