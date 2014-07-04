@@ -27,9 +27,9 @@ int main(int argc, char **argv)
 	_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
 
 	// Set frame resolution
-	WPJALGOManager::GetSharedInst()->SetFrameSize(1024, 768);
+	WPJALGOManager::GetSharedInst()->SetFrameSize(800, 600);
 
-	WPJALGOManager::GetSharedInst()->SetFrameZoomFactor(0.75);
+	WPJALGOManager::GetSharedInst()->SetFrameZoomFactor(0.5);
 	return WPJAppDelegate::GetSharedInst()->Run();	
 }
 

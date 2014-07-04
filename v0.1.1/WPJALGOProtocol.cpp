@@ -111,7 +111,7 @@ WPJSize WPJALGOProtocol::GetDrawOffset()
 void WPJALGOProtocol::SetFrameZoomFactor(float var)
 {
 	m_fFrameZoomFactor = var;
-	SetFrameSize(m_obScreenSize.width * var, m_obScreenSize.height * var);
+	// SetFrameSize(m_obScreenSize.width * var, m_obScreenSize.height * var);
 }
 
 float WPJALGOProtocol::GetFrameZoomFactor()

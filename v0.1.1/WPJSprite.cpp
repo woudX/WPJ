@@ -107,33 +107,55 @@ void WPJSprite::Draw()
 
 	WPJPoint al_pos = RelativeConvertToAllegro();
 	WPJALGOManager *algo = WPJALGOManager::GetSharedInst();
+	
+	ALLEGRO_TRANSFORM transform;
+	al_identity_transform(&transform);
 
+	//	scale sprite
+	al_scale_transform(&transform,
+		m_fScaleX * algo->GetFrameZoomFactor(),
+		m_fScaleY * algo->GetFrameZoomFactor()
+		);
+	al_translate_transform(
+		&transform,
+		- al_pos.x * (m_fScaleX * algo->GetFrameZoomFactor() - 1),
+		- al_pos.y * (m_fScaleY * algo->GetFrameZoomFactor() - 1)
+		);
+
+	//	rotate sprite
+	al_translate_transform(
+		&transform,
+		- (al_pos.x + m_pTexture->GetWidth() * algo->GetFrameZoomFactor()),
+		- (al_pos.y + m_pTexture->GetHeight() * algo->GetFrameZoomFactor())
+		);
+	al_rotate_transform(&transform, m_fAngle);
+	al_translate_transform(
+		&transform,
+		al_pos.x + m_pTexture->GetWidth() * algo->GetFrameZoomFactor(),
+		al_pos.y + m_pTexture->GetHeight() * algo->GetFrameZoomFactor()
+		);
+	
+	al_use_transform(&transform);
+	
+	//	draw sprite
 	if (m_obRegion.Equals(WPJRectZero))
 	{
-		al_draw_tinted_scaled_rotated_bitmap(
+		al_draw_tinted_bitmap(
 			m_pTexture->GetBitmap(),
-			al_map_rgba(m_displayColor.r, m_displayColor.g, m_displayColor.b, m_displayOpacity),		// tint rgba
-			m_pTexture->GetWidth() * m_obAnchorPoint.x, 
-			m_pTexture->GetHeight() * m_obAnchorPoint.y,		// rotate center
-			al_pos.x,
-			al_pos.y,			// draw destination
-			m_fScaleX * algo->GetFrameZoomFactor(), m_fScaleY * algo->GetFrameZoomFactor(),	// scale
-			m_fAngle,		// rotate angle
-			m_ucDrawFlag);	// draw flag		
+			al_map_rgba(m_displayColor.r, m_displayColor.g, m_displayColor.b, m_displayOpacity),
+			al_pos.x,al_pos.y,
+			m_ucDrawFlag
+			);
 	}
 	else
 	{
-		al_draw_tinted_scaled_rotated_bitmap_region(
+		al_draw_tinted_bitmap_region(
 			m_pTexture->GetBitmap(),
+			al_map_rgba(m_displayColor.r, m_displayColor.g, m_displayColor.b, m_displayOpacity),
 			m_obRegion.origin.x, m_obRegion.origin.y, m_obRegion.size.width, m_obRegion.size.height,	// draw region
-			al_map_rgba(m_displayColor.r, m_displayColor.g, m_displayColor.b, m_displayOpacity),		// tint rgba
-			m_pTexture->GetWidth() * m_obAnchorPoint.x, 
-			m_pTexture->GetHeight() * m_obAnchorPoint.y,		// rotate center
-			al_pos.x,
-			al_pos.y,			// draw destination
-			m_fScaleX * algo->GetFrameZoomFactor(), m_fScaleY * algo->GetFrameZoomFactor(),	// scale
-			m_fAngle,		// rotate angle
-			m_ucDrawFlag);	// draw flag		
+			al_pos.x,al_pos.y,
+			m_ucDrawFlag
+			);
 	}
 }
 
@@ -197,24 +219,19 @@ WPJPoint WPJSprite::RelativeConvertToAllegro()
 	float scaleY = WPJDirector::GetSharedInst()->GetALGOManager()->GetScaleY();
 	WPJALGOManager *algo = WPJALGOManager::GetSharedInst();
 
-	if (IsIgnoreAnchorPoint())
-	{
-		t_obAllegroPoint.x = t_obWorldPoint.x;
-		t_obAllegroPoint.y = t_obWorldPoint.y;
-	}
-	else
-	{
-		t_obAllegroPoint.x = t_obWorldPoint.x - m_obAnchorPoint.x * m_pTexture->GetWidth();
-		t_obAllegroPoint.y = t_obWorldPoint.y - m_obAnchorPoint.y * m_pTexture->GetHeight();
-	}
+	t_obAllegroPoint.x = t_obWorldPoint.x;
+	t_obAllegroPoint.y = t_obWorldPoint.y;
 
-	// fix rotate offset, consider the texture may scale
-	t_obAllegroPoint.x += m_pTexture->GetWidth()  * m_obAnchorPoint.x;
-	t_obAllegroPoint.y += m_pTexture->GetHeight()  * m_obAnchorPoint.y;
-	
 	// scale to fit the screen resolution
-	t_obAllegroPoint.x *= algo->GetScaleX();
-	t_obAllegroPoint.y *= algo->GetScaleY();
+	t_obAllegroPoint.x *= algo->GetScaleX() * algo->GetFrameZoomFactor();
+	t_obAllegroPoint.y *= algo->GetScaleY() * algo->GetFrameZoomFactor();
+
+	// anchorPoint fixup
+	if (!IsIgnoreAnchorPoint())
+	{
+		t_obAllegroPoint.x -= m_obAnchorPoint.x * m_pTexture->GetWidth() * algo->GetFrameZoomFactor();
+		t_obAllegroPoint.y -= m_obAnchorPoint.y * m_pTexture->GetHeight() * algo->GetFrameZoomFactor();
+	}
 
 	// update offset to adjust content to real origin
 	t_obAllegroPoint.x += offsetSize.width;

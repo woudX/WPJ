@@ -25,5 +25,4 @@
 
 #endif // !__MINGW32__
 
-
 #endif

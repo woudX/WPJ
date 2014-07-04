@@ -123,6 +123,14 @@ int WPJAppDelegate::Run()
 	background->UpdateDisplayColor(wpc3(100, 100, 100));
 	background->SetScale(size.width / 800, size.height / 600);
 
+	// 初始化边界精灵
+	WPJSprite *border = WPJSprite::Create();
+	border->InitWithFile("background.png");
+	border->SetPosition(0, 0);
+	border->SetIgnoreAnchorPoint(true);
+	border->UpdateDisplayColor(wpc3(255, 0, 0));
+	border->SetScale(WPJALGOManager::GetSharedInst()->GetScaleX(), WPJALGOManager::GetSharedInst()->GetScaleY());
+
 	/************************************************************************/
 	/* Test Area End                                                        */
 	/************************************************************************/
@@ -160,15 +168,7 @@ int WPJAppDelegate::Run()
 			//////////////////////////////////////////////////////////////////////////
 			al_clear_to_color(al_map_rgb_f(0,0,0));
 
-			// background
-			/*
-			al_draw_filled_rectangle(
-				WPJDirector::GetSharedInst()->GetViewOriginPoint().x,
-				WPJDirector::GetSharedInst()->GetViewOriginPoint().y,
-				WPJDirector::GetSharedInst()->GetViewOriginPoint().x + WPJDirector::GetSharedInst()->GetViewSize().width,
-				WPJDirector::GetSharedInst()->GetViewOriginPoint().y + WPJDirector::GetSharedInst()->GetViewSize().height,
-				al_map_rgb(100,100,100));
-				*/
+			border->Draw();
 			background->Draw();
 			sprite->Draw();
 			sprite_2->Draw();

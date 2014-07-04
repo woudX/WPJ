@@ -42,7 +42,7 @@ bool WPJALGOManager::InitALGO()
 	al_init_image_addon();
 
 	// Initialize allegro display
-	m_pDisplay = al_create_display(m_obScreenSize.width, m_obScreenSize.height);
+	m_pDisplay = al_create_display(m_obScreenSize.width * m_fFrameZoomFactor, m_obScreenSize.height * m_fFrameZoomFactor);
 	if (!m_pDisplay)
 	{
 		WPJLOG("[%s] Error in %s(%s) ... Failed to create display\n", _D_NOW_TIME__, __FILE__, __LINE__);
