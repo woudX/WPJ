@@ -1,4 +1,5 @@
 #include "WPJAppDelegate.h"
+#include "WPJGarbageCollection.h"
 #include <random>
 
 #include "WPJTest.h"
@@ -37,8 +38,10 @@ bool WPJAppDelegate::ApplicationDidFinishLaunching()
 bool WPJAppDelegate::Initialization()
 {
 	WPJDirector *t_pDirector = WPJDirector::GetSharedInst();
+	WPJALGOManager *t_pALGOManager = WPJALGOManager::GetSharedInst();
+	t_pALGOManager->SetDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, wResolutionShowAll);
 
-	// Set FPS, default value is 1.0/60
+	// Set FPS, default value is 1.0 / 60
 	t_pDirector->SetAnimationInterval(1.0 / 60);
 
 	// User customed init
@@ -50,8 +53,7 @@ bool WPJAppDelegate::Initialization()
 	
 	// Init ALGO
 	// Set application resolution and policy 
-	WPJALGOManager *t_pALGOManager = WPJALGOManager::GetSharedInst();
-	t_pALGOManager->SetDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, wResolutionShowAll);
+	
 	if (!t_pALGOManager->InitALGO())
 	{
 		WPJLOG("[%s] WPJAppDelegate ... error in InitALGO\n", _D_NOW_TIME__);
@@ -70,7 +72,15 @@ bool WPJAppDelegate::ExtendInit()
 {
 	WPJALGOManager *t_pALGOMgr = WPJALGOManager::GetSharedInst();
 
-	t_pALGOMgr->SetWndName(HString("测试窗口"));
+	t_pALGOMgr->SetWndName(
+		HString::CreateWithFormat(
+			"Test Window ---- now resolution[%d x %d] ---- design [%d x %d] --- zoom : %.2f",
+			(int)(t_pALGOMgr->GetFrameSize().width * t_pALGOMgr->GetFrameZoomFactor()),
+			(int)(t_pALGOMgr->GetFrameSize().height * t_pALGOMgr->GetFrameZoomFactor()),
+			(int)(t_pALGOMgr->GetDesignResolutionSize().width),
+			(int)(t_pALGOMgr->GetDesignResolutionSize().height),
+			(float)(t_pALGOMgr->GetFrameZoomFactor()))
+		);
 
 	return true;
 }
@@ -96,24 +106,34 @@ int WPJAppDelegate::Run()
 	WPJPoint origin = pDirector->GetViewOriginPoint();
 	WPJSize size = pDirector->GetViewSize();
 
-	// 初始化精灵1
+	// 初始化精灵-白
 	WPJMoveTo *moveByAction = WPJMoveTo::Create(5, WPJPoint(WPJDirector::GetSharedInst()->GetViewSize().width - 75,WPJDirector::GetSharedInst()->GetViewSize().height - 75));
 	WPJSprite *sprite = WPJSprite::Create();
 	sprite->InitWithFile("white.png");
 	sprite->SetPosition(75, 75);
 	sprite->RunAction(moveByAction);
 
-	// 初始化精灵2
-	WPJMoveTo *moveByAction_2 = WPJMoveTo::Create(5, WPJPoint(origin.x + size.width - 75, origin.y + 75));
+	// 初始化精灵-黄
+	
+	WPJRotateBy *rotateByAction = WPJRotateBy::Create(2, 3.14);
+	WPJIntervalAction *reverseBy = rotateByAction->Reverse();
+	WPJMoveTo *moveByAction_2 = WPJMoveTo::Create(3, WPJPoint(origin.x + size.width - 75, origin.y + 75));
+	WPJWait *waitAction = WPJWait::Create(2.0);
+	WPJSequence *sequence = WPJSequence::Create(reverseBy, moveByAction_2, waitAction, rotateByAction, NULL);
+
 	WPJSprite *sprite_2 = WPJSprite::Create();
 	sprite_2->InitWithFile("white.png");
-	sprite_2->UpdateDisplayOpacity(100);
+	sprite_2->SetAngle(3.14 / 4);
+	sprite_2->UpdateDisplayOpacity(255);
 	sprite_2->UpdateDisplayColor(wpColor3B(255, 255, 0));
 	sprite_2->SetCoordinateSystem(WPJ_COORDINATE_RELATIVE);
 	sprite_2->SetBlendFunc(new_blend(AL_FUNC_ADD, AL_SRC_ALPHA, AL_SRC_COLOR));
 	sprite_2->SetPosition(WPJPoint(origin.x + 75, origin.y + 75));
-	sprite_2->RunAction(moveByAction_2);
+	// sprite_2->RunAction(moveByAction_2);
+	// sprite_2->RunAction(reverseBy);
+	sprite_2->RunAction(sequence);
 
+	WPJGC *gc = WPJGC::GetSharedInst();
 
 	// 初始化背景图片精灵
 	WPJSprite *background = WPJSprite::Create();
@@ -174,12 +194,12 @@ int WPJAppDelegate::Run()
 			sprite_2->Draw();
 			al_flip_display();
 
-			if (!moveByAction->IsDone())
-				WPJLOG("[%s]Node Position (%f, %f)\n",
+			/*
+			if (!reverseBy->IsDone())
+				WPJLOG("[%s]Node Angle (%f)\n",
 					_D_NOW_TIME__,
-					sprite->GetPosition().x,
-					sprite->GetPosition().y\
-				);
+					sprite_2->GetAngle()
+				);*/
 		}
 		else
 		{

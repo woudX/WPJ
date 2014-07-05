@@ -3,7 +3,6 @@
 
 #include "WPJStdC.h"
 
-
 #define NS_WPJ_BEGIN	namespace wpj_engine {
 #define NS_WPJ_END		}
 #define USING_NS_WPJ	using namespace wpj_engine;
@@ -11,8 +10,10 @@
 /// 调试开关
 //////////////////////////////////////////////////////////////////////////
 #define GC_OPEN
-#define _CRT_SECURE_NO_WARNINGS
 
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+#endif
 
 #define _D_NOW_TIME__	WPJTime::NowTime()
 
@@ -24,9 +25,11 @@
 /// container迭代器宏定义
 //////////////////////////////////////////////////////////////////////////
 #define list_iterator(className) std::list<className>::iterator
+
 #define foreach_in_list_auto(className,itor,container)\
 	for (list_iterator(className) itor = container.begin();\
 		itor != container.end(); itor++)
+
 #define foreach_in_list(className,itor,container)\
 	for (list_iterator(className) itor = container.begin();\
 	itor != container.end();)
@@ -50,12 +53,14 @@
 typedef unsigned int U_INT;
 typedef unsigned char U_CHAR;
 #define U_INT_MAX 0xffffffff
+#define MAX_STRING_LEN	(1024 * 100)
 
 #define WPJRepeatForever U_INT_MAX - 1
 
 #define FLT_EPSILON     1.192092896e-07F
 
 #define UN_USED_PARAM(...)
+
 /// _DEBUG模式
 //////////////////////////////////////////////////////////////////////////
 #ifdef _DEBUG

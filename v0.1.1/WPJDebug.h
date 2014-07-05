@@ -1,7 +1,7 @@
 #ifndef _H_WPJDEBUG
 #define _H_WPJDEBUG
 
-#define _CRT_SECURE_NO_WARNINGS
+//#define _CRT_SECURE_NO_WARNINGS
 #include "WPJMacros.h"
 #include "WPJStdafx.h"
 #include "WPJString.h"

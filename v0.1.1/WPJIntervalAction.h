@@ -74,6 +74,90 @@ public:
 
 	static WPJMoveTo *Create(float fDuration, const WPJPoint& endPosition);
 };
+
+/**
+ *	WPJRotateBy can rotate a WPJNode fAngle in fDuration times 
+ *	on the basis of origin angle
+ */
+class WPJRotateBy : public WPJIntervalAction
+{
+public:
+	WPJRotateBy();
+	WPJRotateBy(float fDuration, float fAngle);
+	~WPJRotateBy();
+
+	virtual WPJRotateBy *DupCopy();
+	virtual WPJIntervalAction *Reverse();
+	virtual void StartWithTarget(WPJNode *target);
+	virtual void Update(float dt);
+
+	float m_fDeltaAngle;
+	float m_fStartAngle;
+	float m_fPreviousAngle;
+
+	static WPJRotateBy *Create(float fDuration, float fAngle);
+};
+
+/**
+ *	WPJRotateTo can rotate a WPJNode to fAngle in fDuration times
+ */
+
+class WPJRotateTo : public WPJRotateBy
+{
+public:
+	WPJRotateTo();
+	WPJRotateTo(float fDuration, float fAngle);
+	~WPJRotateTo();
+
+	virtual WPJRotateTo *DupCopy();
+	virtual void StartWithTarget(WPJNode *target);
+
+	static WPJRotateTo *Create(float fDuration, float fAngle);
+};
+
+/**
+ *	WPJWait can let WPJNode wait fDuration times, and continue to do action
+ *	it often used in action sequence, e.g. like WPJSequence and WPJRepeat ...
+ */
+
+class WPJWait : public WPJIntervalAction
+{
+public:
+	WPJWait();
+	WPJWait(float fDuration);
+	~WPJWait();
+
+	virtual WPJWait *DupCopy();
+	virtual void StartWithTarget(WPJNode *target);
+	virtual void Update(float dt);
+
+	static WPJWait *Create(float fDuration);
+};
+
+class WPJSequence : public WPJIntervalAction
+{
+public:
+	WPJSequence();
+	WPJSequence(WPJFiniteAction *pAction1, WPJFiniteAction *pAction2);
+	~WPJSequence();
+
+	virtual WPJSequence *DupCopy();
+	virtual void StartWithTarget(WPJNode *target);
+	virtual WPJIntervalAction *Reverse();
+	virtual void Update(float dt);
+
+	bool InitWithTwoActions(WPJFiniteAction *pAction1, WPJFiniteAction *pAction2);
+
+	static WPJSequence *Create(WPJFiniteAction *pAction1, ...);
+	static WPJSequence *CreateWithToActions(WPJFiniteAction *pAction1, WPJFiniteAction *pAction2);
+	static WPJSequence *CreateWithVariableList(WPJFiniteAction *pAction1, va_list args);
+private:
+	WPJFiniteAction *m_pAction1, *m_pAction2;
+
+
+};
+
+
 NS_WPJ_END
 
 #endif

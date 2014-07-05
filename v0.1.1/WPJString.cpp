@@ -1,27 +1,37 @@
 #include "WPJString.h"
+#include "WPJGarbageCollection.h"
 
 USING_NS_WPJ
 
-HString::HString():str(""),hashCode(0)
+HString::HString():m_obStr(""),hashCode(0)
 {
 	
 }
 
+HString *HString::CreateNewObject()
+{
+	HString *pRet = new HString();
+	pRet->Retain();
+	WPJGC::GetSharedInst()->AddPtr(pRet);
+
+	return pRet;
+}
+
 HString::HString(std::string orgi)
 {
-	str = orgi;
+	m_obStr = orgi;
 	hashCode = Hash(orgi);
 }
 
 HString::HString(HString const *orgi)
 {
-	str = orgi->str;
+	m_obStr = orgi->m_obStr;
 	hashCode = orgi->hashCode;
 }
 
 HString &HString::operator= (const HString &rhs)
 {
-	str = rhs.str;
+	m_obStr = rhs.m_obStr;
 	hashCode = rhs.hashCode;
 	return *this;
 }
@@ -48,5 +58,54 @@ U_INT HString::Hash(std::string _str)
 
 const char *HString::c_str()
 {
-	return str.c_str();
+	return m_obStr.c_str();
+}
+
+bool HString::InitWithFormatAndValist(const char *format, va_list ap)
+{
+	bool bRet = false;
+	char *pBuf = (char*) malloc(MAX_STRING_LEN);
+
+	if (pBuf != NULL)
+	{
+		vsnprintf(pBuf, MAX_STRING_LEN, format, ap);
+		m_obStr = pBuf;
+		free(pBuf);
+		bRet = true;
+	}
+
+	return bRet;
+}
+
+bool HString::InitWithFormat(const char *format, ... )
+{
+	bool bRet = false;
+	va_list ap;
+	va_start(ap, format);
+	bRet = InitWithFormatAndValist(format, ap);
+	va_end(ap);
+
+	return bRet;
+}
+
+HString *HString::CreatePointerWithFormat(const char *format, ...)
+{
+	HString *pRet = HString::CreateNewObject();
+	va_list ap;
+	va_start(ap, format);
+	pRet->InitWithFormatAndValist(format, ap);
+	va_end(ap);
+
+	return pRet;
+}
+
+HString HString::CreateWithFormat(const char *format, ...)
+{
+	HString pRet;
+	va_list ap;
+	va_start(ap, format);
+	pRet.InitWithFormatAndValist(format, ap);
+	va_end(ap);
+
+	return pRet;
 }

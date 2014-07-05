@@ -14,8 +14,10 @@ NS_WPJ_BEGIN
 class HString : public WPJObject
 {
 public:
-	std::string str;
+	std::string m_obStr;
 	U_INT hashCode;
+
+	static HString *CreateNewObject();
 
 	HString();
 	HString(std::string orgi);
@@ -25,6 +27,11 @@ public:
 	const char *c_str();
 	U_INT Hash(std::string _str);
 	bool EqualWith(const HString *rhs);
+
+	bool InitWithFormatAndValist(const char *format, va_list ap);
+	bool InitWithFormat(const char *format, ... );
+	static HString *CreatePointerWithFormat(const char *format, ...);
+	static HString CreateWithFormat(const char *format, ...);
 };
 
 NS_WPJ_END

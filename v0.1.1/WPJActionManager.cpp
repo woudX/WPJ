@@ -75,20 +75,24 @@ void WPJActionManager::AddAction(WPJNode *pNode, WPJAction *pAction, bool bPause
 		}
 	}
 
+	// regist target
+	pAction->StartWithTarget(pNode);
+
 	// if there is no ActionElement, create a new one and init it
 	if (pActionElem == NULL)
 	{
 		pActionElem = new _ActionElement();
 		pNode->GetSharedPtr(pActionElem->pTarget);
 		pActionElem->bPaused = bPaused;
-	}
 
-	// regist target
-	pAction->StartWithTarget(pNode);
+		m_lpActionElem.push_back(pActionElem);
+	}
 
 	// storage action
 	pActionElem->AddAction(pAction);
-	m_lpActionElem.push_back(pActionElem);
+
+	
+	
 }
 
 void WPJActionManager::RemoveAllAction()

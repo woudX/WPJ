@@ -14,7 +14,6 @@ WPJSprite::WPJSprite()
 WPJSprite *WPJSprite::CreateNewObject()
 {
 	WPJSprite *t_pSprite = new WPJSprite();
-	t_pSprite->Retain();
 
 	WPJGC::GetSharedInst()->AddPtr(t_pSprite);
 	return t_pSprite;
@@ -123,17 +122,12 @@ void WPJSprite::Draw()
 		);
 
 	//	rotate sprite
-	al_translate_transform(
-		&transform,
-		- (al_pos.x + m_pTexture->GetWidth() * algo->GetFrameZoomFactor()),
-		- (al_pos.y + m_pTexture->GetHeight() * algo->GetFrameZoomFactor())
-		);
+	float t_fRotateMoveX = al_pos.x + m_pTexture->GetWidth() * m_fScaleX * algo->GetFrameZoomFactor() / 2;
+	float t_fRotateMoveY = al_pos.y + m_pTexture->GetHeight() * m_fScaleY * algo->GetFrameZoomFactor() / 2;
+	
+	al_translate_transform(&transform, -t_fRotateMoveX, -t_fRotateMoveY);
 	al_rotate_transform(&transform, m_fAngle);
-	al_translate_transform(
-		&transform,
-		al_pos.x + m_pTexture->GetWidth() * algo->GetFrameZoomFactor(),
-		al_pos.y + m_pTexture->GetHeight() * algo->GetFrameZoomFactor()
-		);
+	al_translate_transform(&transform, t_fRotateMoveX, t_fRotateMoveY);
 	
 	al_use_transform(&transform);
 	

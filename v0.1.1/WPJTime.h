@@ -1,6 +1,5 @@
 #ifndef _H_WPJTIME
 #define _H_WPJTIME
-#define _CRT_SECURE_NO_WARNINGS
 
 #include "WPJMacros.h"
 #include "WPJStdafx.h"
