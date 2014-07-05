@@ -20,6 +20,7 @@ by myself. And this engine can not only make STG, but also make other games, rpg
       * Customed Object Pool
       * Object Pool Manager
     + String
+	  * Create
       * Hash Compare
       * String Manager
   + Flow Control
@@ -38,7 +39,11 @@ by myself. And this engine can not only make STG, but also make other games, rpg
       + FiniteAction
         * WPJMoveTo
         * WPJMoveBy
-        * ...
+        * WPJRotateTo
+		* WPJRotateBy
+		* WPJWait
+		* WPJSequence
+		* ...
   + Drawing Tree
     + WPJLayer (Working ...)
     + WPJScene
