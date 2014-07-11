@@ -22,6 +22,9 @@ public:
 	virtual ~WPJIntervalAction();
 
 	// Inherited Methods
+	virtual WPJObject *DupCopy(WPJZone *zone);
+	WPJIntervalAction *Copy();
+
 	virtual void Step(float dt);
 	virtual WPJIntervalAction *Reverse();
 	virtual bool IsDone();
@@ -45,9 +48,11 @@ class WPJMoveBy : public WPJIntervalAction
 public:
 	WPJMoveBy();
 	WPJMoveBy(float fDuration, const WPJPoint& deltaPos);
-	~WPJMoveBy();
+	virtual ~WPJMoveBy();
 
-	virtual WPJMoveBy *DupCopy();
+	virtual WPJObject *DupCopy(WPJZone *zone);
+	WPJMoveBy *Copy();
+
 	virtual WPJIntervalAction *Reverse();
 	virtual void StartWithTarget(WPJNode *target);
 	virtual void Update(float dt);
@@ -56,7 +61,7 @@ public:
 protected:
 	WPJPoint m_obDeltaPositon;
 	WPJPoint m_obStartPoint;
-	WPJPoint m_obPreviousPoint;
+	WPJPoint m_obEndPoint;
 };
 
 /*
@@ -67,9 +72,11 @@ class WPJMoveTo : public WPJMoveBy
 public:
 	WPJMoveTo();
 	WPJMoveTo(float fDuration, const WPJPoint& endPosition);
-	~WPJMoveTo();
+	virtual ~WPJMoveTo();
 
-	virtual WPJMoveTo *DupCopy();
+	virtual WPJObject *DupCopy(WPJZone *zone);
+	WPJMoveTo *Copy();
+
 	virtual void StartWithTarget(WPJNode *target);
 
 	static WPJMoveTo *Create(float fDuration, const WPJPoint& endPosition);
@@ -84,16 +91,18 @@ class WPJRotateBy : public WPJIntervalAction
 public:
 	WPJRotateBy();
 	WPJRotateBy(float fDuration, float fAngle);
-	~WPJRotateBy();
+	virtual ~WPJRotateBy();
 
-	virtual WPJRotateBy *DupCopy();
+	virtual WPJObject *DupCopy(WPJZone *zone);
+	WPJRotateBy *Copy();
+
 	virtual WPJIntervalAction *Reverse();
 	virtual void StartWithTarget(WPJNode *target);
 	virtual void Update(float dt);
 
 	float m_fDeltaAngle;
 	float m_fStartAngle;
-	float m_fPreviousAngle;
+	float m_fEndAngle;
 
 	static WPJRotateBy *Create(float fDuration, float fAngle);
 };
@@ -107,9 +116,11 @@ class WPJRotateTo : public WPJRotateBy
 public:
 	WPJRotateTo();
 	WPJRotateTo(float fDuration, float fAngle);
-	~WPJRotateTo();
+	virtual ~WPJRotateTo();
 
-	virtual WPJRotateTo *DupCopy();
+	virtual WPJObject *DupCopy(WPJZone *zone);
+	WPJRotateTo *Copy();
+
 	virtual void StartWithTarget(WPJNode *target);
 
 	static WPJRotateTo *Create(float fDuration, float fAngle);
@@ -125,38 +136,90 @@ class WPJWait : public WPJIntervalAction
 public:
 	WPJWait();
 	WPJWait(float fDuration);
-	~WPJWait();
+	virtual ~WPJWait();
 
-	virtual WPJWait *DupCopy();
+	virtual WPJObject *DupCopy(WPJZone *zone);
+	WPJWait *Copy();
+
+	
 	virtual void StartWithTarget(WPJNode *target);
 	virtual void Update(float dt);
 
 	static WPJWait *Create(float fDuration);
 };
 
+/**
+ *	WPJSequence is a sequence of WPJFiniteAction, it can contain at least 
+ *	one WPJFiniteAction, and they will be run with order.
+ *
+ *	Notice : the action in sequence don't have ticks, which means all actions
+ *	will be called StartWithTarget() when created, if we don't this, the elapsed
+ *	will be fault
+ */
+
 class WPJSequence : public WPJIntervalAction
 {
 public:
 	WPJSequence();
-	WPJSequence(WPJFiniteAction *pAction1, WPJFiniteAction *pAction2);
-	~WPJSequence();
+	virtual ~WPJSequence();
 
-	virtual WPJSequence *DupCopy();
+	virtual void Release();
+	virtual WPJObject *DupCopy(WPJZone *zone);
+	WPJSequence *Copy();
+
+	virtual void StartWithTarget(WPJNode *target);
+	virtual WPJIntervalAction *Reverse();
+	virtual void Update(float dt);
+
+	bool InitWithTwoActions(WPJFiniteAction *pAction1, WPJFiniteAction *pAction2);
+	
+	static WPJSequence *Create(WPJFiniteAction *pAction1, ...);
+	static WPJSequence *CreateWithTwoActions(WPJFiniteAction *pAction1, WPJFiniteAction *pAction2);
+	static WPJSequence *CreateWithVariableList(WPJFiniteAction *pAction1, va_list args);
+private:
+	WPJFiniteAction *m_pAction1, *m_pAction2;
+};
+
+/**
+ *	WPJSpawn can run at least one action at the same time
+ */
+
+class WPJSpawn : public WPJIntervalAction
+{
+public:
+	WPJSpawn();
+	virtual ~WPJSpawn();
+
+	virtual WPJObject *DupCopy(WPJZone* zone);
+	WPJSpawn *Copy();
+
 	virtual void StartWithTarget(WPJNode *target);
 	virtual WPJIntervalAction *Reverse();
 	virtual void Update(float dt);
 
 	bool InitWithTwoActions(WPJFiniteAction *pAction1, WPJFiniteAction *pAction2);
 
-	static WPJSequence *Create(WPJFiniteAction *pAction1, ...);
-	static WPJSequence *CreateWithToActions(WPJFiniteAction *pAction1, WPJFiniteAction *pAction2);
-	static WPJSequence *CreateWithVariableList(WPJFiniteAction *pAction1, va_list args);
+	static WPJSpawn *Create(WPJFiniteAction *pAction1, ...);
+	static WPJSpawn *CreateWithTwoActions(WPJFiniteAction *pAction1, WPJFiniteAction *pAction2);
+	static WPJSpawn *CreateWithVariableList(WPJFiniteAction *pAction1, va_list args);
+	
 private:
-	WPJFiniteAction *m_pAction1, *m_pAction2;
-
-
+	WPJFiniteAction *m_pAction1;
+	WPJFiniteAction *m_pAction2;
 };
 
+/*
+class WPJRepeat : public WPJIntervalAction
+{
+public:
+	WPJRepeat();
+	~WPJRepeat();
+
+	virtual WPJRepeat *DupCopy();
+	virtual WPJIntervalAction *Reverse();
+	virtual void Update(float dt);
+};
+*/
 
 NS_WPJ_END
 

@@ -87,7 +87,7 @@ typedef unsigned char U_CHAR;
 #define ptr_new(className,ptrName)\
 	WPJTPtr<className> *ptrName = new WPJTPtr<className>()
 #define pp(ptr) (*ptr)
-
+#define ptr_safe_del(p) do { if (p) { delete (p); (p) = 0; } } while(0)
 
 /** WPJ_PROPERTY_READONLY is used to declare protected property
  we can use getter to get the var

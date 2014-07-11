@@ -30,8 +30,8 @@ class WPJActionManager;
 	- Actions				¡Ì
 	- Scheduler and Timer	¡Ì
 	- Draw					¡Ì
-	- Transformation
-	- Coordinate Converters
+	- Transformation			¡Ì
+	- Coordinate Converters	¡Ì
  */
 
 enum WPJ_COORDINATE_SYSTEMS {
@@ -53,9 +53,10 @@ public:
 
 	/// Inherited Method
 	virtual void GetSharedPtr(WPJNode* &object);
-	virtual WPJNode *GetCopiedPtr();
-	virtual WPJNode *DupCopy();
+	WPJNode *Copy();
+	virtual WPJObject *DupCopy(WPJZone *zone);
 	virtual U_INT	GetSize();
+	virtual void Release();
 
 	/// Getter And Setter
 	/**
@@ -265,7 +266,11 @@ class WPJNodeRGBA : public WPJNode, public WPJRGBAProtocol
 {
 public:
 	WPJNodeRGBA();
+	static WPJNodeRGBA *CreateNewObject();
+	virtual WPJObject *DupCopy(WPJZone *zone);
+	WPJNodeRGBA *Copy();
 	virtual ~WPJNodeRGBA();
+	virtual void Release();
 
 	virtual U_CHAR GetDisplayOpacity();
 	virtual void UpdateDisplayOpacity(U_CHAR opacity);

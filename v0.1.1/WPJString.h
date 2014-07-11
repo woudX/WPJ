@@ -23,6 +23,10 @@ public:
 	HString(std::string orgi);
 	HString(const HString *orgi);
 	HString &operator= (const HString &rhs);
+	bool operator== (const HString &rhs);
+	bool operator!= (const HString &rhs);
+	bool operator<	(const HString &rhs) const;
+
 
 	const char *c_str();
 	U_INT Hash(std::string _str);

@@ -7,7 +7,8 @@ USING_NS_WPJ
 //////////////////////////////////////////////////////////////////////////
 
 WPJTexture2D::WPJTexture2D()
-:m_pBitmap(NULL)
+	:m_pBitmap(NULL)
+	,m_obBitmapPath(HString(""))
 {
 
 }
@@ -43,12 +44,23 @@ ALLEGRO_BITMAP *WPJTexture2D::GetBitmap()
 	return m_pBitmap;
 }
 
+HString WPJTexture2D::GetBitmapPath()
+{
+	return m_obBitmapPath;
+}
+
+void WPJTexture2D::SetBitmapPath(HString var)
+{
+	m_obBitmapPath = var;
+}
+
 bool WPJTexture2D::InitWithFile(const char *pszFilename)
 {
 	ASSERT(pszFilename != NULL);
 	bool bRet = true;
 
 	m_pBitmap = al_load_bitmap(pszFilename);
+	m_obBitmapPath = HString(pszFilename);
 	if (!m_pBitmap)
 	{
 		WPJLOG("[%s] Error on loading bitmap : %s\n", _D_NOW_TIME__, pszFilename);
@@ -71,6 +83,7 @@ bool WPJTexture2D::InitWithFile(const char *pszFilename, const WPJRect& rect)
 	else
 	{
 		ALLEGRO_BITMAP *t_pBitmap = al_load_bitmap(pszFilename);
+		m_obBitmapPath = HString(pszFilename);
 		if (!t_pBitmap)
 		{
 			WPJLOG("[%s] Error on loading bitmap : %s\n", _D_NOW_TIME__, pszFilename);
@@ -87,6 +100,8 @@ bool WPJTexture2D::InitWithFile(const char *pszFilename, const WPJRect& rect)
 bool WPJTexture2D::InitWithTexture(WPJTexture2D *pTexture)
 {
 	bool bRet = CopyBitmap(pTexture->GetBitmap(), m_pBitmap);
+	m_obBitmapPath = pTexture->GetBitmapPath();
+
 	return bRet;
 }
 
@@ -102,6 +117,7 @@ bool WPJTexture2D::InitWithTexture(WPJTexture2D *pTexture, const WPJRect& rect)
 	else
 	{
 		bRet = SubBitmap(pTexture->GetBitmap(), m_pBitmap, rect);
+		m_obBitmapPath = pTexture->m_obBitmapPath;
 	}
 
 	return bRet;

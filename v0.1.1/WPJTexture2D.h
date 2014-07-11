@@ -59,6 +59,7 @@ protected:
 
 private:
 	WPJ_PROPERTY_READONLY(ALLEGRO_BITMAP*, m_pBitmap, Bitmap)
+	WPJ_PROPERTY(HString, m_obBitmapPath, BitmapPath)
 };
 
 NS_WPJ_END

@@ -1,6 +1,7 @@
 #include "WPJSprite.h"
 #include "WPJGarbageCollection.h"
 #include "WPJDirector.h"
+#include "WPJTextureManager.h"
 
 USING_NS_WPJ
 
@@ -19,14 +20,42 @@ WPJSprite *WPJSprite::CreateNewObject()
 	return t_pSprite;
 }
 
-WPJSprite *WPJSprite::DupCopy()
+WPJObject *WPJSprite::DupCopy(WPJZone *zone)
 {
-	return NULL;
+	WPJZone *pNewZone = NULL;
+	WPJSprite *pRet = NULL;
+
+	if (zone && zone->m_pCopyZone)
+	{
+		pRet = (WPJSprite *)zone->m_pCopyZone;
+	}
+	else
+	{
+		pRet = WPJSprite::CreateNewObject();
+		zone = pNewZone = new WPJZone(pRet);
+	}
+
+	//	copy parent class
+	WPJNodeRGBA::DupCopy(zone);
+	ptr_safe_del(pNewZone);
+
+	//	copy this class
+	pRet->m_obBlendFunc = m_obBlendFunc;
+	pRet->m_ucDrawFlag = m_ucDrawFlag;
+	pRet->m_bFlipHorizontal = m_bFlipHorizontal;
+	pRet->m_bFlipVertical = m_bFlipVertical;
+	pRet->m_bOpacityModifyRGB = m_bOpacityModifyRGB;
+
+	//	Warn : Texture don't copy, they are resource, so can be shared by many sprites
+	pRet->m_pTexture = WPJTextureManager::GetSharedInst()
+		->CreateNewTexture2D(m_pTexture->GetBitmapPath().c_str());
+
+	return pRet;
 }
 
-WPJSprite *WPJSprite::GetCopiedPtr()
+WPJSprite *WPJSprite::Copy()
 {
-	return DupCopy();
+	return (WPJSprite *)DupCopy(0);
 }
 
 void WPJSprite::GetSharedPtr(WPJSprite* &object)
@@ -44,24 +73,25 @@ WPJSprite *WPJSprite::Create()
 WPJSprite *WPJSprite::Create(const char *pszFilename)
 {
 	WPJSprite *t_pSprite = CreateNewObject();
-	t_pSprite->InitWithFile(pszFilename);
+	WPJTexture2D *t_pTexture2d = WPJTextureManager::GetSharedInst()->CreateNewTexture2D(pszFilename);
+	t_pSprite->SetTexture(t_pTexture2d);
+
 	return t_pSprite;
 }
 
 void WPJSprite::InitWithFile(const char *pszFilename)
 {
-	WPJTexture2D *t_pTexture = WPJTexture2D::CreateNewObject();
-	t_pTexture->InitWithFile(pszFilename);
+	WPJTexture2D *t_pTexture = WPJTextureManager::GetSharedInst()->CreateNewTexture2D(pszFilename);
 	SetTexture(t_pTexture);
 }
 
 void WPJSprite::InitWithFile(const char *pszFilename, const WPJRect& rect)
 {
-	WPJTexture2D *t_pTexture = WPJTexture2D::CreateNewObject();
-	t_pTexture->InitWithFile(pszFilename, rect);
+	WPJTexture2D *t_pTexture = WPJTextureManager::GetSharedInst()->CreateNewTexture2D(pszFilename, rect);
 	SetTexture(t_pTexture);
 }
 
+//	Texture init not used
 void WPJSprite::InitWithTexture(WPJTexture2D *pTexture)
 {
 	WPJTexture2D *t_pTexture = WPJTexture2D::CreateNewObject();
@@ -185,22 +215,22 @@ bool WPJSprite::IsOpacityModifyRGB()
 
 void WPJSprite::SetCascadeColorEnabled(bool bValue)
 {
-	m_bCascadeColor = bValue;
+	m_bCascadeColorEnabled = bValue;
 }
 
 bool WPJSprite::IsCascadeColorEnabled()
 {
-	return m_bCascadeColor;
+	return m_bCascadeColorEnabled;
 }
 
 void WPJSprite::SetCascadeOpacityEnabled(bool bValue)
 {
-	m_bCascadeOpacity = bValue;
+	m_bCascadeOpacityEnabled = bValue;
 }
 
 bool WPJSprite::IsCascadeOpacityEnabled()
 {
-	return m_bCascadeOpacity;
+	return m_bCascadeOpacityEnabled;
 }
 
 WPJPoint WPJSprite::RelativeConvertToAllegro()

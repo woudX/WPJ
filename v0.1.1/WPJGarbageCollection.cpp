@@ -86,9 +86,21 @@ void WPJGC::CheckMemoryLeak()
 
 WPJGC::~WPJGC()
 {
+	//	release all object
+	foreach_in_list_auto(WPJObject*, itor, m_GCList)
+	{
+		if (ptr_data(itor))
+			ptr_data(itor)->Release();
+	}
+
+	//	delete all object
 	foreach_in_list(WPJObject*, itor, m_GCList)
 	{
-		delete ptr_data(itor);
+		if (ptr_data(itor))
+		{
+			delete ptr_data(itor);
+			ptr_data(itor) = NULL;
+		}
 		itor = m_GCList.erase(itor);
 	}
 

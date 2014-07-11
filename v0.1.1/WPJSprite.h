@@ -27,8 +27,9 @@ public:
 
 	WPJSprite();
 	static WPJSprite *CreateNewObject();
-	virtual WPJSprite *DupCopy();
-	virtual WPJSprite *GetCopiedPtr();
+	virtual WPJObject *DupCopy(WPJZone *zone);
+	WPJSprite *Copy();
+
 	virtual void GetSharedPtr(WPJSprite* &object);
 	~WPJSprite();
 
@@ -121,10 +122,6 @@ private:
 
 	//	Opacity modify rgb flag
 	bool m_bOpacityModifyRGB;
-
-	//	Cascade color, opacity
-	bool m_bCascadeColor;
-	bool m_bCascadeOpacity;
 
 };
 

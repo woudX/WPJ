@@ -33,9 +33,16 @@ void WPJObject::SetbInPool(bool var)
 
 WPJObject* WPJObject::DupCopy()
 {
-	WPJObject* newObj = new WPJObject();
+	return WPJObject::CreateNewObject(false);
+}
 
-	return newObj;
+WPJObject *WPJObject::DupCopy(WPJZone *zone)
+{
+	UN_USED_PARAM(zone);
+	WPJLOG("[%s] WPJObject is not implement");
+	ASSERT(0);
+	
+	return 0;
 }
 
 U_INT WPJObject::GetSize()
@@ -67,7 +74,7 @@ void WPJObject::GetSharedPtr(WPJObject* &object)
 
 WPJObject *WPJObject::GetCopiedPtr()
 {
-	return DupCopy();
+	return NULL;
 }
 
 WPJObject *WPJObject::CreateNewObject()
@@ -89,7 +96,8 @@ WPJObject *WPJObject::CreateNewObject(bool t_bInPool = false)
 
 void WPJObject::Update(float dt)
 {
-	WPJLOG("WPJObject update once!\n");
+	UN_USED_PARAM(dt);
+	WPJLOG("[%s] Please implement this method!\n", _D_NOW_TIME__);
 }
 
 WPJObject::~WPJObject()

@@ -28,16 +28,24 @@ public:
 	WPJObject();
 
 	void Retain();
-	void Release();
+	virtual void Release();
 
 	static WPJObject *CreateNewObject();
 	static WPJObject *CreateNewObject(bool t_bInPool);
 
 	virtual void GetSharedPtr(WPJObject* &object);
 	virtual WPJObject *GetCopiedPtr();
+
+	//	In WPJObject, Dupcopy is no use because this class is only use
+	//	to count how many times this class has been quoted
+	//	When it's subclass call DupCopy, all data in WPJObject will be init
 	virtual WPJObject* DupCopy();
+	virtual WPJObject* DupCopy(WPJZone *zone);
+	
+	//	Get This Object Size
 	virtual U_INT GetSize();
 
+	//	
 	virtual void Update(float dt);
 	virtual ~WPJObject();
 };

@@ -21,8 +21,10 @@ public:
 
 	// Inherit Methods
 	virtual void GetSharedPtr(WPJAction* &object);
-	virtual WPJAction *GetCopiedPtr();
-	virtual WPJAction *DupCopy();
+	virtual WPJObject *DupCopy(WPJZone *zone);
+	WPJAction *Copy();
+
+	virtual void Release();
 	virtual void Update(float dt);
 
 	// Main Methods
@@ -42,6 +44,9 @@ public:
 	// Constructor and Destructor
 	static WPJFiniteAction *CreateNewObject();
 	WPJFiniteAction();
+
+	virtual WPJObject *DupCopy(WPJZone *zone);
+	WPJFiniteAction *Copy();
 	virtual ~WPJFiniteAction();
 
 	// Main Method

@@ -37,14 +37,68 @@ void WPJNode::GetSharedPtr(WPJNode* &object)
 	object->Retain();
 }
 
-WPJNode *WPJNode::GetCopiedPtr()
+WPJObject *WPJNode::DupCopy(WPJZone *zone)
 {
-	return DupCopy();
+	WPJNode *pRet;
+	
+	if (zone && zone->m_pCopyZone)
+	{
+		pRet = (WPJNode *)zone->m_pCopyZone;
+	}
+	else
+	{
+		pRet = WPJNode::CreateNewObject();
+	}
+
+	//	basic properties
+	pRet->m_iZOrder = m_iZOrder;
+	pRet->m_iTag = m_iTag;
+	pRet->m_bIsRunning = m_bIsRunning;
+	pRet->m_bIgnoreAnchorPoint = m_bIgnoreAnchorPoint;
+	pRet->m_ucCoordinateSystem = m_ucCoordinateSystem;
+	pRet->SetScale(m_fScaleX, m_fScaleY);
+	pRet->m_bVisible = m_bVisible;
+	pRet->m_obAnchorPoint = m_obAnchorPoint;
+	pRet->m_obPosition = m_obPosition;
+	pRet->m_obRegion = m_obRegion;
+	pRet->m_fAngle = m_fAngle;
+
+	//	don't copy parent
+	pRet->m_pParent = NULL;
+
+	//	singleton
+	pRet->m_pScheduler = m_pScheduler;
+	pRet->m_pActionManager = m_pActionManager;
+
+	//	copy all child
+	foreach_in_list_auto(WPJNode*, itor, m_lChildList)
+	{
+		WPJNode *t_pChild = pp(itor)->Copy();
+		pRet->AddChild(t_pChild);
+	}
+
+	return pRet;
 }
 
-WPJNode *WPJNode::DupCopy()
+WPJNode *WPJNode::Copy()
 {
-	return NULL;
+	return (WPJNode *)DupCopy(0);
+}
+
+void WPJNode::Release()
+{
+	WPJObject::Release();
+
+	//	release parent
+	if (m_pParent != NULL)
+		m_pParent->Release();
+
+	//	release all child
+	foreach_in_list_auto(WPJNode*, itor, m_lChildList)
+	{
+		if (pp(itor) != NULL)
+			pp(itor)->Release();
+	}
 }
 
 U_INT WPJNode::GetSize()
@@ -518,8 +572,6 @@ WPJPoint WPJNode::RelativeConvertToWorld()
 	return t_obWorldPoint;
 }
 
-
-
 WPJNode::~WPJNode()
 {
 
@@ -536,6 +588,54 @@ WPJNodeRGBA::WPJNodeRGBA()
 
 {
 
+}
+
+WPJNodeRGBA *WPJNodeRGBA::CreateNewObject()
+{
+	WPJNodeRGBA *pRet = new WPJNodeRGBA();
+	WPJGC::GetSharedInst()->AddPtr(pRet);
+
+	return pRet;
+}
+
+void WPJNodeRGBA::Release()
+{
+	WPJNode::Release();
+}
+
+WPJObject *WPJNodeRGBA::DupCopy(WPJZone *zone)
+{
+	WPJZone *pNewZone = NULL;
+	WPJNodeRGBA *pRet = NULL;
+
+	if (zone && zone->m_pCopyZone)
+	{
+		pRet = (WPJNodeRGBA *)zone->m_pCopyZone;
+	}
+	else
+	{
+		pRet = WPJNodeRGBA::CreateNewObject();
+		zone = pNewZone = new WPJZone(pRet);
+	}
+
+	//	copy parent class
+	WPJNode::DupCopy(zone);
+	ptr_safe_del(pNewZone);
+	
+	//	copy this class
+	pRet->m_displayOpacity = m_displayOpacity;
+	pRet->m_displayColor = m_displayColor;
+	pRet->m_realOpacity = m_realOpacity;
+	pRet->m_realColor = m_realColor;
+	pRet->m_bCascadeColorEnabled = m_bCascadeColorEnabled;
+	pRet->m_bCascadeOpacityEnabled = m_bCascadeOpacityEnabled;
+
+	return pRet;
+}
+
+WPJNodeRGBA *WPJNodeRGBA::Copy()
+{
+	return (WPJNodeRGBA *)DupCopy(0);
 }
 
 U_CHAR WPJNodeRGBA::GetDisplayOpacity()

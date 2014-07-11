@@ -36,6 +36,25 @@ HString &HString::operator= (const HString &rhs)
 	return *this;
 }
 
+bool HString::operator== (const HString &rhs) 
+{
+	return this->EqualWith(&rhs);
+}
+
+bool HString::operator!= (const HString &rhs) 
+{
+	return !(this->EqualWith(&rhs));
+}
+
+bool HString::operator< (const HString &rhs) const
+{
+	bool bRet = false;
+	if (m_obStr.compare(rhs.m_obStr) < 0)
+		bRet = true;
+
+	return bRet;
+}
+
 bool HString::EqualWith(HString const *rhs)
 {
 	return hashCode == rhs->hashCode;
