@@ -28,7 +28,8 @@ public:
 	WPJObject();
 
 	void Retain();
-	virtual void Release();
+	void Release();
+	void AutoRelease();
 
 	static WPJObject *CreateNewObject();
 	static WPJObject *CreateNewObject(bool t_bInPool);
@@ -39,7 +40,6 @@ public:
 	//	In WPJObject, Dupcopy is no use because this class is only use
 	//	to count how many times this class has been quoted
 	//	When it's subclass call DupCopy, all data in WPJObject will be init
-	virtual WPJObject* DupCopy();
 	virtual WPJObject* DupCopy(WPJZone *zone);
 	
 	//	Get This Object Size

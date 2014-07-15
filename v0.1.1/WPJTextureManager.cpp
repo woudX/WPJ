@@ -54,6 +54,7 @@ WPJTexture2D *WPJTextureManager::CreateNewTexture2D(const char *pszFilename, con
 	if (itor != m_mpTextureCache.end())
 	{
 		pRet = itor->second;	
+		pRet->Retain();
 	}
 	else
 	{
@@ -73,15 +74,27 @@ void WPJTextureManager::ClearTextureCache()
 	std::map<HString, WPJTexture2D *>::iterator itor;
 	for (itor = m_mpTextureCache.begin(); itor != m_mpTextureCache.end();)
 	{
-		while (itor->second && (itor->second->GetReference() != 0))
+
+		int refCount = 1;
+
+		//	when GC_OPEN, Texture2D need to be relased by WPJGC
+#if GC_TYPE == GC_OPEN
+		++refCount;	
+#endif
+
+		while (itor->second && (itor->second->GetReference() != refCount))
 		{
-			itor->second->Release();
+			itor->second->Release();		
 		}
+
+		//	Issue 2: when not in GC_OPEN, the refCount == 0 and itor will crashed
+		itor->second->Release();	
+
 		itor = m_mpTextureCache.erase(itor);
 	}
 }
 
 WPJTextureManager::~WPJTextureManager()
 {
-	ClearTextureCache();
+	// ClearTextureCache();
 }

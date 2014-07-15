@@ -8,17 +8,15 @@ USING_NS_WPJ
 void _ActionElement::ClearAllActions()
 {
 	foreach_in_list_auto(WPJAction*, itor, m_lpActions)
-		pp(itor)->Release();
+		WPJ_SAFE_RELEASE(pp(itor));
+
 	m_lpActions.clear();
 }
 
 void _ActionElement::AddAction(WPJAction *pAction)
 {
-	if (pAction != NULL)
-	{
-		pAction->Retain();
-		m_lpActions.push_back(pAction);
-	}
+	WPJ_SAFE_RETAIN(pAction);
+	m_lpActions.push_back(pAction);
 }
 
 void _ActionElement::Update(float dt)
@@ -38,8 +36,7 @@ void _ActionElement::Update(float dt)
 _ActionElement::~_ActionElement()
 {
 	ClearAllActions();
-	pTarget->Release();
-	pTarget = NULL;
+	WPJ_SAFE_RELEASE_NULL(pTarget);
 }
 
 /// WPJActionManager
@@ -82,16 +79,15 @@ void WPJActionManager::AddAction(WPJNode *pNode, WPJAction *pAction, bool bPause
 	if (pActionElem == NULL)
 	{
 		pActionElem = new _ActionElement();
-		pNode->GetSharedPtr(pActionElem->pTarget);
-		pActionElem->bPaused = bPaused;
+		pActionElem->pTarget = pNode;
+		WPJ_SAFE_RETAIN(pNode);
 
+		pActionElem->bPaused = bPaused;
 		m_lpActionElem.push_back(pActionElem);
 	}
 
 	// storage action
 	pActionElem->AddAction(pAction);
-
-	
 	
 }
 

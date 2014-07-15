@@ -15,8 +15,8 @@ WPJSprite::WPJSprite()
 WPJSprite *WPJSprite::CreateNewObject()
 {
 	WPJSprite *t_pSprite = new WPJSprite();
+	t_pSprite->AutoRelease();
 
-	WPJGC::GetSharedInst()->AddPtr(t_pSprite);
 	return t_pSprite;
 }
 
@@ -79,6 +79,11 @@ WPJSprite *WPJSprite::Create(const char *pszFilename)
 	return t_pSprite;
 }
 
+void WPJSprite::Release()
+{
+	WPJNodeRGBA::Release();
+}
+
 void WPJSprite::InitWithFile(const char *pszFilename)
 {
 	WPJTexture2D *t_pTexture = WPJTextureManager::GetSharedInst()->CreateNewTexture2D(pszFilename);
@@ -113,10 +118,9 @@ WPJTexture2D *WPJSprite::GetTexture()
 
 void WPJSprite::SetTexture(WPJTexture2D *texture)
 {
-	if (m_pTexture != NULL)
-		m_pTexture->Release();
-
+	WPJ_SAFE_RELEASE(m_pTexture);
 	m_pTexture = texture;
+	WPJ_SAFE_RETAIN(texture);
 }
 
 wpBlendFunc WPJSprite::GetBlendFunc()
@@ -258,8 +262,8 @@ WPJPoint WPJSprite::RelativeConvertToAllegro()
 	}
 
 	// update offset to adjust content to real origin
-	t_obAllegroPoint.x += offsetSize.width;
-	t_obAllegroPoint.y += offsetSize.height;
+	t_obAllegroPoint.x += offsetSize.width * algo->GetFrameZoomFactor();
+	t_obAllegroPoint.y += offsetSize.height * algo->GetFrameZoomFactor();
 
 	return t_obAllegroPoint;
 }
@@ -276,5 +280,6 @@ void WPJSprite::Update(float dt)
 
 WPJSprite::~WPJSprite()
 {
-
+	//	Release texture2d
+	WPJ_SAFE_RELEASE(m_pTexture);
 }

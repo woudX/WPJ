@@ -24,15 +24,13 @@ public:
 	virtual WPJObject *DupCopy(WPJZone *zone);
 	WPJAction *Copy();
 
-	virtual void Release();
-	virtual void Update(float dt);
-
 	// Main Methods
 	virtual bool IsDone();
 	virtual void StartWithTarget(WPJNode *target);
 	virtual void Step(float dt);
 	virtual void Stop();
-	
+	virtual void Update(float dt);
+
 protected:
 	WPJ_PROPERTY(int,m_nTag,Tag)
 	WPJ_PROPERTY(WPJNode*,m_pTarget,Target)

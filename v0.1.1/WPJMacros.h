@@ -3,24 +3,57 @@
 
 #include "WPJStdC.h"
 
-#define NS_WPJ_BEGIN	namespace wpj_engine {
-#define NS_WPJ_END		}
-#define USING_NS_WPJ	using namespace wpj_engine;
-
-/// 调试开关
-//////////////////////////////////////////////////////////////////////////
-#define GC_OPEN
-
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
+#define NS_WPJ_BEGIN	namespace wpj_engine {
+#define NS_WPJ_END		}
+#define USING_NS_WPJ	using namespace wpj_engine;
+
+/// Garbage Collection
+//////////////////////////////////////////////////////////////////////////
+
+//	WPJEngine provide 3 kind of methods to do with garbage collection
+//	- GC_OPEN : this method will collect garbage automatically when a frame done ,
+//		you	can also set GC_MAX_COUNT to control the max count in each collection
+#define GC_OPEN		0
+
+//	- GC_WATCH : this method will help developer to watch memory status, every
+//		object created by factory method will be watched. When main func ends, the
+//		engine will print how much resource have been leak, also you can use WPJGC
+//		to watch now leak when debuging
+//
+//		like:	WPJGC::GetSharedInst()->CheckMemoryLeak()
+//
+//		---- We recommend you to use GC_OPEN if you have not confident with memory manage ----
+#define GC_WATCH	1
+
+//	- GC_CLOSE : this method will do nothing with garbage collection, when GC_Close, all
+//		works about gc will paused, actually, the programs will be more faster
+//		so, we recommend to use GC_CLOSE when all systems finish and debug well
+#define GC_CLOSE	2
+
+//	Please select garbage collection type
+#define GC_TYPE	GC_OPEN
+
+//	Every time garbage collection can recycle count, don't too big or too less
+#define GC_MAX_COUNT 400000
+
+//	Safe retain and release
+#define WPJ_SAFE_RETAIN(p) do { if (p) { (p)->Retain(); } } while (0)
+#define WPJ_SAFE_RELEASE(p) do { if (p) { (p)->Release(); } } while (0)
+#define WPJ_SAFE_RELEASE_NULL(p) do { if (p) { (p)->Release(); (p) = NULL; } } while(0)
+
+
+#define POOL_MAX_SIZE 500
+
+
+
+
+
 #define _D_NOW_TIME__	WPJTime::NowTime()
 
-/// GC回收默认最大值
-//////////////////////////////////////////////////////////////////////////
-#define GC_MAX_COUNT 400000
-#define POOL_MAX_SIZE 500
 
 /// container迭代器宏定义
 //////////////////////////////////////////////////////////////////////////

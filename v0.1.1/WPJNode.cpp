@@ -26,7 +26,7 @@ WPJNode::WPJNode()
 WPJNode *WPJNode::CreateNewObject()
 {
 	WPJNode *t_pNode = new WPJNode();
-	WPJGC::GetSharedInst()->AddPtr(t_pNode);
+	t_pNode->AutoRelease();
 
 	return t_pNode;
 }
@@ -87,18 +87,9 @@ WPJNode *WPJNode::Copy()
 
 void WPJNode::Release()
 {
+
 	WPJObject::Release();
 
-	//	release parent
-	if (m_pParent != NULL)
-		m_pParent->Release();
-
-	//	release all child
-	foreach_in_list_auto(WPJNode*, itor, m_lChildList)
-	{
-		if (pp(itor) != NULL)
-			pp(itor)->Release();
-	}
 }
 
 U_INT WPJNode::GetSize()
@@ -574,7 +565,14 @@ WPJPoint WPJNode::RelativeConvertToWorld()
 
 WPJNode::~WPJNode()
 {
+	//	release parent
+	WPJ_SAFE_RELEASE(m_pParent);
 
+	//	release all child
+	foreach_in_list_auto(WPJNode*, itor, m_lChildList)
+	{
+		WPJ_SAFE_RELEASE(pp(itor));
+	}
 }
 
 /// WPJNodeRGBA
@@ -593,7 +591,7 @@ WPJNodeRGBA::WPJNodeRGBA()
 WPJNodeRGBA *WPJNodeRGBA::CreateNewObject()
 {
 	WPJNodeRGBA *pRet = new WPJNodeRGBA();
-	WPJGC::GetSharedInst()->AddPtr(pRet);
+	pRet->AutoRelease();
 
 	return pRet;
 }

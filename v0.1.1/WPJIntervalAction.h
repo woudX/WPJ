@@ -25,6 +25,7 @@ public:
 	virtual WPJObject *DupCopy(WPJZone *zone);
 	WPJIntervalAction *Copy();
 
+	virtual void Stop();
 	virtual void Step(float dt);
 	virtual WPJIntervalAction *Reverse();
 	virtual bool IsDone();
@@ -56,7 +57,8 @@ public:
 	virtual WPJIntervalAction *Reverse();
 	virtual void StartWithTarget(WPJNode *target);
 	virtual void Update(float dt);
-	
+	virtual void Stop();
+
 	static WPJMoveBy *Create(float fDuration, const WPJPoint& deltaPos);
 protected:
 	WPJPoint m_obDeltaPositon;
@@ -99,6 +101,7 @@ public:
 	virtual WPJIntervalAction *Reverse();
 	virtual void StartWithTarget(WPJNode *target);
 	virtual void Update(float dt);
+	virtual void Stop();
 
 	float m_fDeltaAngle;
 	float m_fStartAngle;
@@ -140,10 +143,10 @@ public:
 
 	virtual WPJObject *DupCopy(WPJZone *zone);
 	WPJWait *Copy();
-
 	
 	virtual void StartWithTarget(WPJNode *target);
 	virtual void Update(float dt);
+	virtual void Stop();
 
 	static WPJWait *Create(float fDuration);
 };
@@ -163,13 +166,13 @@ public:
 	WPJSequence();
 	virtual ~WPJSequence();
 
-	virtual void Release();
 	virtual WPJObject *DupCopy(WPJZone *zone);
 	WPJSequence *Copy();
 
 	virtual void StartWithTarget(WPJNode *target);
 	virtual WPJIntervalAction *Reverse();
 	virtual void Update(float dt);
+	virtual void Stop();
 
 	bool InitWithTwoActions(WPJFiniteAction *pAction1, WPJFiniteAction *pAction2);
 	
@@ -196,6 +199,7 @@ public:
 	virtual void StartWithTarget(WPJNode *target);
 	virtual WPJIntervalAction *Reverse();
 	virtual void Update(float dt);
+	virtual void Stop();
 
 	bool InitWithTwoActions(WPJFiniteAction *pAction1, WPJFiniteAction *pAction2);
 
@@ -208,18 +212,32 @@ private:
 	WPJFiniteAction *m_pAction2;
 };
 
-/*
+/**
+ *	WPJRepeat can run a WPJFiniteAction with n times (0 <= n <= MAX_INT), including WPJSequeue and WPJSpawn
+ */
 class WPJRepeat : public WPJIntervalAction
 {
 public:
 	WPJRepeat();
 	~WPJRepeat();
 
-	virtual WPJRepeat *DupCopy();
+	virtual WPJObject *DupCopy(WPJZone *zone);
+	WPJRepeat *Copy();
 	virtual WPJIntervalAction *Reverse();
+
+	virtual void StartWithTarget(WPJNode *target);
 	virtual void Update(float dt);
+	virtual void Stop();
+
+	void InitWithAction(WPJFiniteAction *pAction, int iRepeatCount);
+	static WPJRepeat *Create(WPJFiniteAction *pAction, int iRepeatCount);
+
+private:
+	WPJFiniteAction *m_pRepeatAction;
+	int m_iRepeatCount;
+	int m_iCompleteCount;
 };
-*/
+
 
 NS_WPJ_END
 

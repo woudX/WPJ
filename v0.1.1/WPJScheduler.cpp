@@ -12,13 +12,11 @@ _SchedulerTimers::_SchedulerTimers()
 
 _SchedulerTimers::~_SchedulerTimers()
 {
-	if (target != NULL)
-		target->Release();
+	WPJ_SAFE_RELEASE(target);
 
 	foreach_in_list_auto(WPJTimer*, itor, timers)
 	{
-		if ((*itor) != NULL)
-			(*itor)->Release();
+		WPJ_SAFE_RELEASE(pp(itor));
 	}
 
 	timers.clear();
@@ -35,8 +33,7 @@ _SchedulerUpdates::_SchedulerUpdates()
 
 _SchedulerUpdates::~_SchedulerUpdates()
 {
-	if (target != NULL)
-		target->Release();
+	WPJ_SAFE_RELEASE(target);
 }
 
 WPJTimer::WPJTimer()
@@ -56,7 +53,7 @@ WPJTimer::WPJTimer()
 WPJTimer *WPJTimer::CreateNewObject()
 {
 	WPJTimer *timer = new WPJTimer();
-	WPJGC::GetSharedInst()->AddPtr(timer);
+	timer->AutoRelease();
 
 	return timer;
 }
@@ -186,7 +183,8 @@ U_INT WPJScheduler::GetSize()
 WPJScheduler *WPJScheduler::CreateNewObject()
 {
 	WPJScheduler *scheduler = new WPJScheduler();
-	WPJGC::GetSharedInst()->AddPtr(scheduler);
+	scheduler->AutoRelease();
+
 	return scheduler;
 }
 
@@ -236,7 +234,8 @@ void WPJScheduler::ScheduleSelector(WPJObject *target, SEL_SCHEDULE pfnSelector,
 		// initalize schedulerTimers
 		_SchedulerTimers *schedulerTimers = new _SchedulerTimers();
 		schedulerTimers->paused = bPaused;
-		target->GetSharedPtr(schedulerTimers->target);
+		schedulerTimers->target = target;
+		WPJ_SAFE_RETAIN(target);
 
 		WPJTimer *timer = WPJTimer::CreateNewObject(); ASSERT(timer != NULL);
 		timer->InitalWithTarget(target, pfnSelector, fInterval, nRepeat, fDelay);
@@ -269,8 +268,7 @@ void WPJScheduler::UnscheduleSelector(WPJObject *target, SEL_SCHEDULE pfnSelecto
 				if ((*t_itor)->GetpfnSelector() == pfnSelector)
 				{
 					// release Timer and erase from the timers
-					(*t_itor)->Release();
-					(*t_itor) = NULL;
+					WPJ_SAFE_RELEASE_NULL(pp(t_itor));
 					t_itor = (*itor)->timers.erase(t_itor);
 				}
 				else
@@ -287,8 +285,7 @@ void WPJScheduler::UnscheduleAllSelector(WPJObject *target)
 			foreach_in_list_auto(WPJTimer*, t_itor, (*itor)->timers)
 			{
 				// release timer
-				(*t_itor)->Release();
-				(*t_itor) = NULL;
+				WPJ_SAFE_RELEASE_NULL(pp(t_itor));
 			}
 
 		(*itor)->timers.clear();
@@ -321,7 +318,9 @@ void WPJScheduler::CheckInsertUpdate(std::list<_SchedulerUpdates*> &updateList, 
 	{
 		_SchedulerUpdates *schedulerUpdate = new _SchedulerUpdates();	ASSERT(schedulerUpdate != NULL);
 		schedulerUpdate->paused = bPaused;
-		target->GetSharedPtr(schedulerUpdate->target);
+		schedulerUpdate->target = target;
+		WPJ_SAFE_RETAIN(target);
+
 		schedulerUpdate->priority = nPriority;
 
 		updateList.push_back(schedulerUpdate);
@@ -393,6 +392,9 @@ bool WPJScheduler::IsTargetPaused(WPJObject *target)
 
 	if (t_pUpdate != NULL)
 		return t_pUpdate->paused;
+
+	ASSERT(0);
+	return false;
 }
 
 void WPJScheduler::Update(float dt)
@@ -434,8 +436,7 @@ void WPJScheduler::Update(float dt)
 	{
 		if ((*itor)->markedForDeletion)
 		{
-			delete (*itor);
-			(*itor) = NULL;
+			ptr_safe_del(pp(itor));
 			itor = m_lUpdatePosList.erase(itor);
 		}
 		else
@@ -446,8 +447,7 @@ void WPJScheduler::Update(float dt)
 	{
 		if ((*itor)->markedForDeletion)
 		{
-			delete (*itor);
-			(*itor) = NULL;
+			ptr_safe_del(pp(itor));
 			itor = m_lUpdate0List.erase(itor);
 		}
 		else
@@ -458,8 +458,7 @@ void WPJScheduler::Update(float dt)
 	{
 		if ((*itor)->markedForDeletion)
 		{
-			delete (*itor);
-			(*itor) = NULL;
+			ptr_safe_del(pp(itor));
 			itor = m_lUpdateNegList.erase(itor);
 		}
 		else

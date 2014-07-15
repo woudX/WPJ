@@ -20,7 +20,7 @@ public:
 	~_ActionElement();
 };
 
-class WPJActionManager : WPJObject
+class WPJActionManager : public WPJObject
 {
 public:
 	static WPJActionManager *GetsharedInst();

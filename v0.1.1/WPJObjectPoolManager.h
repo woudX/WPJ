@@ -7,7 +7,7 @@
 
 NS_WPJ_BEGIN
 
-class WPJObjectPoolManager : WPJObject
+class WPJObjectPoolManager
 {
 private:
 	std::list<WPJObjectPool* > m_pools;

@@ -15,7 +15,7 @@ WPJIntervalAction::WPJIntervalAction()
 WPJIntervalAction *WPJIntervalAction::CreateNewObject()
 {
 	WPJIntervalAction *t_pIntervalAction = new WPJIntervalAction();
-	WPJGC::GetSharedInst()->AddPtr(t_pIntervalAction);
+	t_pIntervalAction->AutoRelease();
 
 	return t_pIntervalAction;
 }
@@ -46,6 +46,11 @@ WPJIntervalAction *WPJIntervalAction::Copy()
 	return (WPJIntervalAction *)DupCopy(0);
 }
 
+void WPJIntervalAction::Stop()
+{
+	m_pTarget = NULL;
+}
+
 void WPJIntervalAction::Step(float dt)
 {
 	if (!m_bInitial)
@@ -55,6 +60,7 @@ void WPJIntervalAction::Step(float dt)
 	}
 	else if (!IsDone()) 
 	{
+		float next_dt = ((m_fElapsed + dt) > m_fDuration) ? (m_fDuration - m_fElapsed) : dt;
 		m_fElapsed += dt;
 		Update(dt);
 	}
@@ -75,8 +81,9 @@ WPJIntervalAction *WPJIntervalAction::Reverse()
 void WPJIntervalAction::StartWithTarget(WPJNode *target)
 {
 	WPJFiniteAction::StartWithTarget(target);
+
 	m_bInitial = false;
-	m_fElapsed = 0;
+	m_fElapsed = 0.0f;
 }
 
 WPJIntervalAction::~WPJIntervalAction()
@@ -101,13 +108,15 @@ WPJMoveBy::WPJMoveBy(float fDuration, const WPJPoint& deltaPos)
 WPJMoveBy *WPJMoveBy::Create(float fDuration, const WPJPoint& deltaPos)
 {
 	WPJMoveBy *t_pMoveBy = new WPJMoveBy(fDuration, deltaPos);
-	WPJGC::GetSharedInst()->AddPtr(t_pMoveBy);
+	t_pMoveBy->AutoRelease();
+
 	return t_pMoveBy;
 }
 
 void WPJMoveBy::StartWithTarget(WPJNode *target)
 {
 	WPJIntervalAction::StartWithTarget(target);
+
 	m_obEndPoint = target->GetPosition() + m_obDeltaPositon;
 	m_obStartPoint = target->GetPosition();
 }
@@ -115,6 +124,11 @@ void WPJMoveBy::StartWithTarget(WPJNode *target)
 WPJIntervalAction *WPJMoveBy::Reverse()
 {
 	return WPJMoveBy::Create(m_fDuration, -m_obDeltaPositon);
+}
+
+void WPJMoveBy::Stop()
+{
+	WPJIntervalAction::Stop();
 }
 
 void WPJMoveBy::Update(float dt)
@@ -175,7 +189,8 @@ WPJMoveTo::WPJMoveTo(float fDuration, const WPJPoint& endPosition)
 WPJMoveTo *WPJMoveTo::Create(float fDuration, const WPJPoint& endPosition)
 {
 	WPJMoveTo *t_pMoveTo = new WPJMoveTo(fDuration, endPosition);
-	WPJGC::GetSharedInst()->AddPtr(t_pMoveTo);
+	t_pMoveTo->AutoRelease();
+
 	return t_pMoveTo;
 }
 
@@ -208,6 +223,7 @@ WPJMoveTo *WPJMoveTo::Copy()
 void WPJMoveTo::StartWithTarget(WPJNode *target)
 {
 	WPJIntervalAction::StartWithTarget(target);
+
 	m_obStartPoint = target->GetPosition();
 	m_obEndPoint = m_obDeltaPositon;
 }
@@ -260,13 +276,19 @@ WPJRotateBy *WPJRotateBy::Copy()
 void WPJRotateBy::StartWithTarget(WPJNode *target)
 {
 	WPJIntervalAction::StartWithTarget(target);
+
 	m_fStartAngle = target->GetAngle();
 	m_fEndAngle = target->GetAngle() + m_fDeltaAngle;
 }
 
 WPJIntervalAction *WPJRotateBy::Reverse()
 {
-	return new WPJRotateBy(m_fDuration, -m_fDeltaAngle);
+	return WPJRotateBy::Create(m_fDuration, -m_fDeltaAngle);
+}
+
+void WPJRotateBy::Stop()
+{
+	WPJIntervalAction::Stop();
 }
 
 void WPJRotateBy::Update(float dt)
@@ -284,7 +306,8 @@ void WPJRotateBy::Update(float dt)
 WPJRotateBy *WPJRotateBy::Create(float fDuration, float fAngle)
 {
 	WPJRotateBy *pRet = new WPJRotateBy(fDuration, fAngle);
-	WPJGC::GetSharedInst()->AddPtr(pRet);
+	pRet->AutoRelease();
+
 	return pRet;
 }
 
@@ -336,6 +359,7 @@ WPJRotateTo::WPJRotateTo(float fDuration, float fAngle)
 void WPJRotateTo::StartWithTarget(WPJNode *target)
 {
 	WPJIntervalAction::StartWithTarget(target);
+
 	m_fStartAngle = target->GetAngle();
 	m_fEndAngle = m_fDeltaAngle;
 	
@@ -344,7 +368,7 @@ void WPJRotateTo::StartWithTarget(WPJNode *target)
 WPJRotateTo *WPJRotateTo::Create(float fDuration, float fAngle)
 {
 	WPJRotateTo *pRet = new WPJRotateTo(fDuration, fAngle);
-	WPJGC::GetSharedInst()->AddPtr(pRet);
+	pRet->AutoRelease();
 
 	return pRet;
 }
@@ -399,6 +423,11 @@ void WPJWait::StartWithTarget(WPJNode *target)
 	WPJIntervalAction::StartWithTarget(target);
 }
 
+void WPJWait::Stop()
+{
+	WPJIntervalAction::Stop();
+}
+
 void WPJWait::Update(float dt)
 {
 	UN_USED_PARAM(dt);
@@ -407,7 +436,7 @@ void WPJWait::Update(float dt)
 WPJWait *WPJWait::Create(float fDuration)
 {
 	WPJWait *pRet = new WPJWait(fDuration);
-	WPJGC::GetSharedInst()->AddPtr(pRet);
+	pRet->AutoRelease();
 
 	return pRet;
 }
@@ -510,7 +539,7 @@ WPJSequence *WPJSequence::CreateWithTwoActions(WPJFiniteAction *pAction1, WPJFin
 {
 	WPJSequence *pRet = new WPJSequence();
 	pRet->InitWithTwoActions(pAction1, pAction2);
-	WPJGC::GetSharedInst()->AddPtr(pRet);
+	pRet->AutoRelease();
 
 	return pRet;
 }
@@ -518,7 +547,7 @@ WPJSequence *WPJSequence::CreateWithTwoActions(WPJFiniteAction *pAction1, WPJFin
 void WPJSequence::StartWithTarget(WPJNode *target)
 {
 	WPJIntervalAction::StartWithTarget(target);
-
+	
 	// Issue_1 :
 	// This place should need not to call, this will let tick lose efficacy
 	// but if not call this , the action will call StartWithTarget on first time, which
@@ -536,12 +565,20 @@ bool WPJSequence::InitWithTwoActions(WPJFiniteAction *pAction1, WPJFiniteAction 
 	m_fDuration = pAction1->GetDuration() + pAction2->GetDuration();
 
 	m_pAction1 = pAction1;
-	pAction1->Retain();
+	WPJ_SAFE_RETAIN(m_pAction1);
 
 	m_pAction2 = pAction2;
-	pAction2->Retain();
+	WPJ_SAFE_RETAIN(m_pAction2);
 
 	return true;
+}
+
+void WPJSequence::Stop()
+{
+	WPJIntervalAction::Stop();
+
+	m_pAction1->Stop();
+	m_pAction2->Stop();
 }
 
 void WPJSequence::Update(float dt)
@@ -557,19 +594,10 @@ void WPJSequence::Update(float dt)
 	}
 }
 
-void WPJSequence::Release()
-{
-	//	release itself
-	WPJIntervalAction::Release();
-
-	//	release sons
-	m_pAction1->Release();
-	m_pAction2->Release();
-}
-
 WPJSequence::~WPJSequence()
 {
-	
+	WPJ_SAFE_RELEASE(m_pAction1);
+	WPJ_SAFE_RELEASE(m_pAction2);
 }
 
 ///	WPJSpawn
@@ -626,6 +654,14 @@ WPJIntervalAction *WPJSpawn::Reverse()
 	return NULL;
 }
 
+void WPJSpawn::Stop()
+{
+	WPJIntervalAction::Stop();
+
+	m_pAction1->Stop();
+	m_pAction2->Stop();
+}
+
 void WPJSpawn::Update(float dt)
 {
 	m_pAction1->Step(dt);
@@ -642,10 +678,11 @@ bool WPJSpawn::InitWithTwoActions(WPJFiniteAction *pAction1, WPJFiniteAction *pA
 	m_fDuration = max(pAction1->GetDuration(), pAction2->GetDuration());
 
 	m_pAction1 = pAction1;
-	pAction1->Retain();
-	m_pAction2 = pAction2;
-	pAction2->Retain();
+	WPJ_SAFE_RETAIN(pAction1);
 
+	m_pAction2 = pAction2;
+	WPJ_SAFE_RETAIN(pAction2);
+	
 	return true;
 }
 
@@ -664,8 +701,7 @@ WPJSpawn *WPJSpawn::Create(WPJFiniteAction *pAction1, ...)
 WPJSpawn *WPJSpawn::CreateWithTwoActions(WPJFiniteAction *pAction1, WPJFiniteAction *pAction2)
 {
 	WPJSpawn *pRet = new WPJSpawn();
-	pRet->Retain();
-
+	pRet->AutoRelease();
 	pRet->InitWithTwoActions(pAction1, pAction2);
 
 	return pRet;
@@ -698,5 +734,104 @@ WPJSpawn *WPJSpawn::CreateWithVariableList(WPJFiniteAction *pAction1, va_list ar
 
 WPJSpawn::~WPJSpawn()
 {
+	WPJ_SAFE_RELEASE(m_pAction1);
+	WPJ_SAFE_RELEASE(m_pAction2);
+}
 
+///	WPJRepeat
+//////////////////////////////////////////////////////////////////////////
+
+WPJRepeat::WPJRepeat()
+	:m_pRepeatAction(NULL)
+	,m_iCompleteCount(0)
+	,m_iRepeatCount(0)
+{
+
+}
+
+void WPJRepeat::StartWithTarget(WPJNode *target)
+{
+	WPJIntervalAction::StartWithTarget(target);
+
+	m_pRepeatAction->StartWithTarget(target);
+}
+
+WPJObject *WPJRepeat::DupCopy(WPJZone *zone)
+{
+	WPJRepeat *pRet = NULL;
+	WPJZone *pNewZone = NULL;
+
+	if (zone && zone->m_pCopyZone)
+	{
+		pRet = (WPJRepeat *)zone->m_pCopyZone;
+	}
+	else
+	{
+		WPJFiniteAction *t_pRepeatAction = m_pRepeatAction->Copy();
+		pRet = WPJRepeat::Create(t_pRepeatAction, m_iRepeatCount);
+
+		zone = pNewZone = new WPJZone(pRet);
+	}
+
+	WPJIntervalAction::DupCopy(zone);
+	ptr_safe_del(pNewZone);
+
+	return pRet;
+}
+
+WPJRepeat *WPJRepeat::Copy()
+{
+	return (WPJRepeat *)DupCopy(0);
+}
+
+void WPJRepeat::InitWithAction(WPJFiniteAction *pAction, int iRepeatCount)
+{
+	m_iRepeatCount = iRepeatCount;
+	m_pRepeatAction = pAction;
+
+	//	set the duration of WPJRepeat
+	m_fDuration = pAction->GetDuration() * iRepeatCount;
+
+	WPJ_SAFE_RETAIN(pAction);
+}
+
+WPJRepeat *WPJRepeat::Create(WPJFiniteAction *pAction, int iRepeatCount)
+{
+	WPJRepeat *pRet = new WPJRepeat();
+	pRet->AutoRelease();
+	pRet->InitWithAction(pAction, iRepeatCount);
+
+	return pRet;
+}
+
+WPJIntervalAction *WPJRepeat::Reverse()
+{
+	return WPJRepeat::Create(m_pRepeatAction->Reverse(), m_iRepeatCount);
+}
+
+void WPJRepeat::Stop()
+{
+	WPJIntervalAction::Stop();
+
+	m_pRepeatAction->Stop();
+}
+
+void WPJRepeat::Update(float dt)
+{
+	int iNextChange = m_pRepeatAction->GetDuration() * (m_iCompleteCount + 1);
+	m_pRepeatAction->Step(dt);
+
+	if (m_fElapsed > iNextChange)
+	{
+		m_pRepeatAction->Stop();
+		m_pRepeatAction->StartWithTarget(m_pTarget);
+
+		m_iCompleteCount++;
+	}
+	
+}
+
+WPJRepeat::~WPJRepeat()
+{
+	WPJ_SAFE_RELEASE(m_pRepeatAction);
 }

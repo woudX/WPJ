@@ -43,7 +43,8 @@ WPJDirector::WPJDirector()
 ,m_uFrames(0)
 ,m_pLastTimeVal(new TimeVal())
 {
-	
+	WPJ_SAFE_RETAIN(m_pScheduler);
+	WPJ_SAFE_RETAIN(m_pActionManager);
 }
 
 void WPJDirector::RunWithScene(WPJScene *pScene) 
@@ -55,11 +56,13 @@ void WPJDirector::RunWithScene(WPJScene *pScene)
 void WPJDirector::PushScene(WPJScene *pScene)
 {
 	m_obSceneStack.push(pScene);
-	pScene->Retain();
+	WPJ_SAFE_RETAIN(pScene);
 
 	m_bCleanUpRunningScene = false;
 
-	pScene->GetSharedPtr(m_pNextScene);
+	WPJ_SAFE_RELEASE(m_pNextScene);
+	m_pNextScene = pScene;
+	WPJ_SAFE_RETAIN(m_pNextScene);
 }
 
 void WPJDirector::PopScene()
@@ -76,7 +79,10 @@ void WPJDirector::PopScene()
 	else
 	{
 		m_bCleanUpRunningScene = true;
-		m_obSceneStack.top()->GetSharedPtr(m_pNextScene);
+
+		WPJ_SAFE_RELEASE(m_pNextScene);
+		m_pNextScene = m_obSceneStack.top();
+		WPJ_SAFE_RETAIN(m_pNextScene);
 	}
 }
 
@@ -84,12 +90,12 @@ void WPJDirector::ReplaceWithScene(WPJScene *pScene)
 {
 	WPJScene *t_pScene = m_obSceneStack.top();
 	m_obSceneStack.pop();
-	t_pScene->Release();
+	WPJ_SAFE_RELEASE(t_pScene);
 
 	m_bCleanUpRunningScene = true;
 
 	m_obSceneStack.push(pScene);
-	pScene->Retain();
+	WPJ_SAFE_RETAIN(pScene);
 }
 
 void WPJDirector::PopToRootScene()
@@ -125,14 +131,18 @@ void WPJDirector::PopToSceneStackLevel(int pStackLevel)
 				t_pScene->OnExitTransitionDidStart();
 				t_pScene->OnExit();
 			}
+
 			t_pScene->CleanUp();
-			t_pScene->Release();
+			WPJ_SAFE_RETAIN(t_pScene);
 
 			--t_iCount;
 		}
 
 		// Set next scene but not CleanupRunningScene
-		m_obSceneStack.top()->GetSharedPtr(m_pNextScene);
+		WPJ_SAFE_RELEASE(m_pNextScene);
+		m_pNextScene = m_obSceneStack.top();
+		WPJ_SAFE_RETAIN(m_pNextScene);
+
 		m_bCleanUpRunningScene = false;
 	}
 }
@@ -242,6 +252,14 @@ WPJSize WPJDirector::GetDrawOffset()
 	return m_pALGOManager->GetDrawOffset();
 }
 
+WPJDirector::~WPJDirector()
+{
+	WPJ_SAFE_RELEASE(m_pScheduler);
+	WPJ_SAFE_RELEASE(m_pActionManager);
+}
+
+/// WPJDisplayLinkDirector
+//////////////////////////////////////////////////////////////////////////
 WPJDisplayLinkDirector::WPJDisplayLinkDirector()
 	:m_bInvalid(false)
 {

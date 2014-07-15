@@ -109,32 +109,40 @@ int WPJAppDelegate::Run()
 	WPJSize size = pDirector->GetViewSize();
 
 	// 初始化精灵-白
+	
 	WPJMoveTo *moveByAction = WPJMoveTo::Create(5, WPJPoint(WPJDirector::GetSharedInst()->GetViewSize().width - 75,WPJDirector::GetSharedInst()->GetViewSize().height - 75));
 	WPJRotateBy *rotateBy = WPJRotateBy::Create(10, 3.14 * 3);
 	WPJSpawn *spawn = WPJSpawn::Create(moveByAction, rotateBy, NULL);
+	
 	WPJSprite *sprite = WPJSprite::Create();
 	sprite->InitWithFile("white.png");
 	sprite->SetPosition(75, 75);
 	sprite->RunAction(spawn);
-	
+
 	
 	//	初始化精灵黄
 	WPJRotateBy *rotateByAction = WPJRotateBy::Create(2, 3.14);
 	WPJIntervalAction *reverseBy = rotateByAction->Reverse();
+	WPJMoveBy *moveBy = WPJMoveBy::Create(3, _npoint(origin.x + size.width - 150, 0));
+	WPJWait *waitAction = WPJWait::Create(2.0);
+	WPJSequence *laihui = WPJSequence::Create(reverseBy, moveBy, waitAction, reverseBy->Reverse(), moveBy->Reverse(), NULL);
+	WPJRepeat *rRepeat = WPJRepeat::Create(laihui, 10);
+	WPJSprite *sprite_2 = WPJSprite::Create();
+
 	WPJIntervalAction *reverseBy_2 = rotateByAction->Reverse();
 	WPJMoveTo *moveByAction_2 = WPJMoveTo::Create(3, WPJPoint(origin.x + size.width - 75, origin.y + 75));
 	WPJSpawn *spawn_2 = WPJSpawn::Create(reverseBy_2, moveByAction_2, NULL);
-	WPJWait *waitAction = WPJWait::Create(2.0);
 	WPJSequence *sequence = WPJSequence::Create(reverseBy, spawn_2, waitAction, rotateByAction, NULL);
-	WPJSprite *sprite_2 = WPJSprite::Create();
+
+
 	sprite_2->InitWithFile("white.png");
-	sprite_2->SetAngle(3.14 / 4);
-	sprite_2->UpdateDisplayOpacity(255);
+	sprite_2->SetAngle(0);
+	sprite_2->UpdateDisplayOpacity(100);
 	sprite_2->UpdateDisplayColor(wpColor3B(255, 255, 0));
 	sprite_2->SetCoordinateSystem(WPJ_COORDINATE_RELATIVE);
 	sprite_2->SetBlendFunc(new_blend(AL_FUNC_ADD, AL_SRC_ALPHA, AL_SRC_COLOR));
 	sprite_2->SetPosition(WPJPoint(origin.x + 75, origin.y + 75));
-	sprite_2->RunAction(sequence);
+	sprite_2->RunAction(rRepeat);
 
 	// 初始化复制的精灵
 	WPJSprite *copySprite = sprite_2->Copy();
@@ -150,6 +158,7 @@ int WPJAppDelegate::Run()
 	background->SetPosition(origin.x + size.width / 2, origin.y + size.height / 2);
 	background->UpdateDisplayColor(wpc3(100, 100, 100));
 	background->SetScale(size.width / 800, size.height / 600);
+	background->Retain();
 
 	// 初始化边界精灵
 	WPJSprite *border = WPJSprite::Create();
@@ -158,7 +167,7 @@ int WPJAppDelegate::Run()
 	border->SetIgnoreAnchorPoint(true);
 	border->UpdateDisplayColor(wpc3(255, 0, 0));
 	border->SetScale(WPJALGOManager::GetSharedInst()->GetScaleX(), WPJALGOManager::GetSharedInst()->GetScaleY());
-
+	border->Retain();
 	/************************************************************************/
 	/* Test Area End                                                        */
 	/************************************************************************/
@@ -204,12 +213,20 @@ int WPJAppDelegate::Run()
 			
 			al_flip_display();
 
+			//	release autorelease pool
+			WPJGC::GetSharedInst()->Pop();
+
+			//	garbage collection
+			WPJGC::GetSharedInst()->GC();
+			
 			/*
 			if (!reverseBy->IsDone())
-				WPJLOG("[%s]Node Angle (%f)\n",
+				WPJLOG("[%s]Node (%f, %f)\n",
 					_D_NOW_TIME__,
-					sprite_2->GetAngle()
-				);*/
+					sprite_2->RelativeConvertToAllegro().x,
+					sprite_2->RelativeConvertToAllegro().y
+				);
+				*/
 		}
 		else
 		{
@@ -222,12 +239,16 @@ int WPJAppDelegate::Run()
 
 int WPJAppDelegate::Exit()
 {
-	WPJTextureManager::GetSharedInst()->GC();
-	delete WPJTextureManager::GetSharedInst();
+	// WPJTextureManager::GetSharedInst()->GC();
 	WPJALGOManager::GetSharedInst()->DestroyALGO();
+	delete WPJTextureManager::GetSharedInst();
 	delete WPJALGOManager::GetSharedInst();
 	delete WPJDirector::GetSharedInst();
+	delete WPJActionManager::GetsharedInst();
+	WPJGC::GetSharedInst()->Finalize();
 	delete WPJGC::GetSharedInst();
 	
+	system("pause");
+
 	return 0;
 }

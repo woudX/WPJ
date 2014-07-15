@@ -67,7 +67,8 @@ bool WPJAction::IsDone()
 
 void WPJAction::StartWithTarget(WPJNode *target)
 {
-	target->GetSharedPtr(m_pTarget);
+	//	Issue 3
+	m_pTarget = target;
 }
 
 void WPJAction::SetTag(int var) 
@@ -90,18 +91,13 @@ WPJNode *WPJAction::GetTarget()
 	return m_pTarget;
 }
 
-void WPJAction::Release()
-{
-	WPJObject::Release();
-
-	if (m_pTarget)
-		m_pTarget->Release();
-
-}
-
 WPJAction::~WPJAction()
 {
+	//	Issue 3 : Action series don't do any retain/release operation
+	//	about target, this agreement may make things easier, let
+	//	WPJActionManager to deal with these things is ok
 
+	//	WPJ_SAFE_RELEASE(m_pTarget);
 }
 
 /// WPJFiniteAction

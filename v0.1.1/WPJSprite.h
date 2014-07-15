@@ -43,6 +43,9 @@ public:
 	//	the image origin is upper-left cornor
 	static WPJSprite *Create(const char *pszFilename, const WPJRect& rect);
 
+	//	Release this object
+	virtual void Release();
+
 	/**
 	 *	Initial
 	 */

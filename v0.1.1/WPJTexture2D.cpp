@@ -16,9 +16,7 @@ WPJTexture2D::WPJTexture2D()
 WPJTexture2D *WPJTexture2D::CreateNewObject()
 {
 	WPJTexture2D *t_pTexture2D = new WPJTexture2D();
-	t_pTexture2D->Retain();
-
-	WPJGC::GetSharedInst()->AddPtr(t_pTexture2D);
+	t_pTexture2D->AutoRelease();
 
 	return t_pTexture2D;
 }

@@ -31,11 +31,6 @@ void WPJObject::SetbInPool(bool var)
 	m_bInPool = var;
 }
 
-WPJObject* WPJObject::DupCopy()
-{
-	return WPJObject::CreateNewObject(false);
-}
-
 WPJObject *WPJObject::DupCopy(WPJZone *zone)
 {
 	UN_USED_PARAM(zone);
@@ -58,8 +53,30 @@ void WPJObject::Retain()
 void WPJObject::Release()
 {
 	--m_uReference;
-	//m_bIsLive = false;
+
+	if (m_uReference == 0)
+	{
+		//	if not define GC_OPEN, when a object delete, it must be removed
+		//	from WPJGC watching list firstly
+#if GC_TYPE == GC_WATCH
+		WPJGC::GetSharedInst()->RemovePtr(this);
+#endif
+		
+		delete this;
+	}
+		// m_bIsLive = false;
 }
+
+void WPJObject::AutoRelease()
+{
+	ASSERT(m_uReference > 0);
+	WPJGC::GetSharedInst()->AddObject(this);
+
+#if GC_TYPE != GC_CLOSE
+	WPJGC::GetSharedInst()->AddPtr(this);
+#endif
+}
+
 
 U_INT WPJObject::GetReference()
 {
@@ -80,7 +97,7 @@ WPJObject *WPJObject::GetCopiedPtr()
 WPJObject *WPJObject::CreateNewObject()
 {
 	WPJObject *object = new WPJObject();
-	WPJGC::GetSharedInst()->AddPtr(object);
+	object->AutoRelease();
 
 	return object;
 }
@@ -89,8 +106,9 @@ WPJObject *WPJObject::CreateNewObject(bool t_bInPool = false)
 {
 	WPJObject *object = new WPJObject();
 	object->m_bInPool = t_bInPool;
-	WPJGC::GetSharedInst()->AddPtr(object);
 
+	WPJGC::GetSharedInst()->AddPtr(object);
+	
 	return object;
 }
 
