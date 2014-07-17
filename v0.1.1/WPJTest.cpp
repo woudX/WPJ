@@ -6,8 +6,7 @@ USING_NS_WPJ
 WPJNodeTest *WPJNodeTest::CreateNewObject()
 {
 	WPJNodeTest *t_pNodeTest = new WPJNodeTest();
-	t_pNodeTest->Retain();
-	WPJGC::GetSharedInst()->AddPtr(t_pNodeTest);
+	t_pNodeTest->AutoRelease();
 
 	return t_pNodeTest;
 }
@@ -46,6 +45,11 @@ void WPJNodeTest::TestFuncB(float dt)
 void WPJNodeTest::Update(float dt)
 {
 	WPJLOG("[%s] Test Info ... Come from Update , dt = %f\n" , _D_NOW_TIME__, dt);
+}
+
+void WPJNodeTest::Test()
+{
+	WPJLOG("[%s] Test Info ... Come from Test\n" , _D_NOW_TIME__);
 }
 
 void WPJNodeTest::OnEnterTransitionDidFinish()

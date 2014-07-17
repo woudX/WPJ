@@ -135,7 +135,6 @@ void WPJMoveBy::Stop()
 
 void WPJMoveBy::Update(float dt)
 {
-	WPJLOG("line dt : %f\n", dt);
 	if (m_pTarget) 
 	{
 #if WPJ_ENABLED_ACTION_STACK
@@ -300,7 +299,6 @@ void WPJRotateBy::Stop()
 
 void WPJRotateBy::Update(float dt)
 {
-	WPJLOG("Rotate : %f\n", dt);
 	if (m_pTarget != NULL)
 	{
 #if WPJ_ENABLED_ACTION_STACK
@@ -675,42 +673,6 @@ void WPJSequence::Update(float dt)
 		m_pAction2->Update(1.0f);
 		m_pAction2->Stop();
 	}
-
-	/*
-	if (!m_bInitAction1 && m_pAction1)
-	{
-		m_bInitAction1 = true;
-		m_pAction1->StartWithTarget(m_pTarget);
-	}
-
-	if (!m_pAction1->IsDone())
-	{
-		m_pAction1->Step((dt - m_fLastDt) * m_fDuration);
-
-		//	Issue 6 : if system is lose efficacy, dt can be so large that bigger than
-		//	this action's duration, so, external time must be back
-		if (m_pAction1->IsDone())
-			m_fElapsed = m_pAction1->GetDuration();
-	}
-	else if (m_pAction2)
-	{
-		if (!m_bInitAction2)
-		{
-			m_bInitAction2 = true;
-			m_pAction2->StartWithTarget(m_pTarget);
-
-			//	Issue 4 : the first action will eat external time, so when 
-			//	the second action begin, it need find back this time
-			m_fLastDt = m_pAction1->GetDuration() / m_fDuration;
-		}
-
-		if (!m_pAction2->IsDone())
-			m_pAction2->Step((dt - m_fLastDt) * m_fDuration);
-	}
-
-	m_fLastDt = dt;
-	*/
-
 }
 
 WPJSequence::~WPJSequence()
@@ -982,27 +944,6 @@ void WPJRepeat::Update(float dt)
 	{
 		m_pRepeatAction->Update(fmodf(dt * m_iRepeatCount, 1.0f));
 	}
-		
-	/*
-	m_pRepeatAction->Step((dt - m_fLastDt) * m_fDuration);
-
-	if (m_pRepeatAction->IsDone())
-	{
-		//	Issue 7 : Let this action finish
-		m_pRepeatAction->Update(1.0f);
-
-		m_pRepeatAction->Stop();
-		m_pRepeatAction->StartWithTarget(m_pTarget);
-		m_iCompleteCount++;
-
-		//	Issue 6
-		m_fElapsed = m_pRepeatAction->GetDuration() * m_iCompleteCount;
-		m_fLastDt = m_fElapsed / m_fDuration;
-		
-	}
-	else
-		m_fLastDt = dt;
-	*/
 }
 
 WPJRepeat::~WPJRepeat()

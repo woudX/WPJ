@@ -11,6 +11,8 @@ NS_WPJ_BEGIN
 	many methods and variables to provide basic support for the derived class
 */
 
+class WPJNode;
+
 class WPJObject : public WPJCopying
 {
 private:
@@ -51,8 +53,16 @@ public:
 };
 
 typedef void (WPJObject::*SEL_SCHEDULE)(float);
+typedef void (WPJObject::*SEL_CALLFUNC)();
+typedef void (WPJObject::*SEL_CALLFUNCN)(WPJNode*);
+typedef void (WPJObject::*SEL_CALLFUNCND)(WPJNode*, void *);
+typedef void (WPJObject::*SEL_CALLFUNCO)(WPJObject*);
 
 #define schedule_selector(_SELECTOR) (SEL_SCHEDULE)(&_SELECTOR)
+#define callfunc_selector(_SELECTOR) (SEL_CALLFUNC)(&_SELECTOR)
+#define callfuncN_selector(_SELECTOR) (SEL_CALLFUNCN)(&_SELECTOR)
+#define callfuncND_selector(_SELECTOR) (SEL_CALLFUNCND)(&_SELECTOR)
+#define callfuncO_selector(_SELECTOR) (SEL_CALLFUNCO)(&_SELECTOR)
 
 class WPJAnime : public WPJObject
 {

@@ -143,9 +143,13 @@ int WPJAppDelegate::Run()
 	WPJSpawn *spawn_2 = WPJSpawn::CreateWithTwoActions(reverseBy_2, moveByAction_2);
 
 	WPJSpawn *backAndRotate = WPJSpawn::CreateWithTwoActions(reverseBy->Copy(),placeBy2);
+
+	WPJCallFunc *callFunc = WPJCallFunc::Create(WPJNodeTest::CreateNewObject(), 
+		callfunc_selector(WPJNodeTest::Test));
+
 	WPJSequence *sequence = WPJSequence::Create(
 		moveBy,reverseBy,
-		backAndRotate, backAndRotate, NULL);
+		backAndRotate, backAndRotate,callFunc, NULL);
 
 	float dt = 0;
 	sprite_2->InitWithFile("4color.png");
@@ -156,8 +160,8 @@ int WPJAppDelegate::Run()
 	sprite_2->SetBlendFunc(new_blend(AL_FUNC_ADD, AL_SRC_ALPHA, AL_SRC_COLOR));
 	sprite_2->SetPosition(WPJPoint(origin.x + 75, origin.y + 75));
 	sprite_2->RunAction(WPJRepeat::Create(sequence, 3));
-/*
 
+/*
 	// 初始化复制的精灵
 	WPJSprite *copySprite = sprite_2->Copy();
 	copySprite->UpdateDisplayColor(wpc3(0,0,255));

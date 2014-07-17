@@ -21,6 +21,7 @@ public:
 	void TestFuncA(float dt);
 	void TestFuncB(float dt);
 	virtual void Update(float dt);
+	void Test();
 
 	virtual void OnEnterTransitionDidFinish();
 };
