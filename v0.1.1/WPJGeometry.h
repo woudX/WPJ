@@ -3,6 +3,7 @@
 
 #include "WPJStdafx.h"
 #include "WPJMacros.h"
+#include "WPJGeometryEx.h"
 
 /**
  *	WPJGeometry contains many kinds of geometry class used in the WPJEngine, including:

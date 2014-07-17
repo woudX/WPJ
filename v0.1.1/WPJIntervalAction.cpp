@@ -46,23 +46,26 @@ WPJIntervalAction *WPJIntervalAction::Copy()
 	return (WPJIntervalAction *)DupCopy(0);
 }
 
-void WPJIntervalAction::Stop()
-{
-	m_pTarget = NULL;
-}
-
 void WPJIntervalAction::Step(float dt)
 {
+	//	Issue 5 : in cocos2dx , this is if else statement, but in WPJ this may
+	//	let dt lost ,which will let whole action lost a bit
 	if (!m_bInitial)
 	{
 		m_bInitial = true;
 		m_fElapsed = 0;
 	}
-	else if (!IsDone()) 
+	
+	if (!IsDone()) 
 	{
-		float next_dt = ((m_fElapsed + dt) > m_fDuration) ? (m_fDuration - m_fElapsed) : dt;
 		m_fElapsed += dt;
-		Update(dt);
+
+		Update(max(0,
+			min(1, 
+				m_fElapsed / 
+					max(m_fDuration, FLT_EPSILON)
+				)
+			));
 	}
 }
 
@@ -117,8 +120,7 @@ void WPJMoveBy::StartWithTarget(WPJNode *target)
 {
 	WPJIntervalAction::StartWithTarget(target);
 
-	m_obEndPoint = target->GetPosition() + m_obDeltaPositon;
-	m_obStartPoint = target->GetPosition();
+	m_obStartPosition = m_obPreviousPosition = target->GetPosition();
 }
 
 WPJIntervalAction *WPJMoveBy::Reverse()
@@ -133,12 +135,20 @@ void WPJMoveBy::Stop()
 
 void WPJMoveBy::Update(float dt)
 {
+	WPJLOG("line dt : %f\n", dt);
 	if (m_pTarget) 
 	{
-		WPJPoint t_obPos = m_pTarget->GetPosition();
-		if (dt >= 0.00001)
-			t_obPos = t_obPos + ((m_obEndPoint - m_obStartPoint) / m_fDuration) * dt;
-		m_pTarget->SetPosition(t_obPos);
+#if WPJ_ENABLED_ACTION_STACK
+		WPJPoint t_obNowPosition = m_pTarget->GetPosition();
+		WPJPoint t_obDiff = t_obNowPosition - m_obPreviousPosition;
+		m_obStartPosition += t_obDiff;
+		WPJPoint t_obNewPosition = m_obStartPosition + m_obDeltaPositon * dt;
+		m_obPreviousPosition = t_obNewPosition;
+
+		m_pTarget->SetPosition(t_obNewPosition);
+#else
+		m_pTarget->SetPosition(m_obStartPosition + m_obStartPosition * dt);
+#endif
 	}
 }
 
@@ -183,7 +193,7 @@ WPJMoveTo::WPJMoveTo()
 WPJMoveTo::WPJMoveTo(float fDuration, const WPJPoint& endPosition)
 {
 	m_fDuration = fDuration;
-	m_obDeltaPositon = endPosition;
+	m_obEndPosition = endPosition;
 }
 
 WPJMoveTo *WPJMoveTo::Create(float fDuration, const WPJPoint& endPosition)
@@ -205,7 +215,7 @@ WPJObject *WPJMoveTo::DupCopy(WPJZone *zone)
 	}
 	else
 	{
-		pRet = WPJMoveTo::Create(m_fDuration, m_obDeltaPositon);
+		pRet = WPJMoveTo::Create(m_fDuration, m_obEndPosition);
 		zone = pNewZone = new WPJZone(pRet);
 	}
 
@@ -222,10 +232,8 @@ WPJMoveTo *WPJMoveTo::Copy()
 
 void WPJMoveTo::StartWithTarget(WPJNode *target)
 {
-	WPJIntervalAction::StartWithTarget(target);
-
-	m_obStartPoint = target->GetPosition();
-	m_obEndPoint = m_obDeltaPositon;
+	WPJMoveBy::StartWithTarget(target);
+	m_obDeltaPositon = m_obEndPosition - m_obStartPosition;
 }
 
 WPJMoveTo::~WPJMoveTo()
@@ -277,8 +285,7 @@ void WPJRotateBy::StartWithTarget(WPJNode *target)
 {
 	WPJIntervalAction::StartWithTarget(target);
 
-	m_fStartAngle = target->GetAngle();
-	m_fEndAngle = target->GetAngle() + m_fDeltaAngle;
+	m_fPreviousAngle = m_fStartAngle = fmodf(target->GetAngle(), MATH_PI * 2);
 }
 
 WPJIntervalAction *WPJRotateBy::Reverse()
@@ -293,13 +300,20 @@ void WPJRotateBy::Stop()
 
 void WPJRotateBy::Update(float dt)
 {
+	WPJLOG("Rotate : %f\n", dt);
 	if (m_pTarget != NULL)
 	{
-		float t_fAngle = m_pTarget->GetAngle();
-
-		if (dt >= 0.00001)
-			t_fAngle += ((m_fEndAngle - m_fStartAngle) / m_fDuration) * dt;
-		m_pTarget->SetAngle(t_fAngle);
+#if WPJ_ENABLED_ACTION_STACK
+		float t_fNowAngle = m_pTarget->GetAngle();
+		float t_fDiff = t_fNowAngle - m_fPreviousAngle;
+		m_fStartAngle += t_fDiff;
+		float t_fNewAngle = m_fStartAngle + m_fDeltaAngle * dt;
+		t_fNewAngle = fmodf(t_fNewAngle, MATH_PI * 2);
+		m_fPreviousAngle = t_fNewAngle;
+		m_pTarget->SetAngle(t_fNewAngle);
+#else
+		m_pTarget->SetAngle(m_fStartAngle + m_fDeltaAngle * dt);
+#endif
 	}
 }
 
@@ -335,7 +349,7 @@ WPJObject *WPJRotateTo::DupCopy(WPJZone *zone)
 	}
 	else
 	{
-		pRet = WPJRotateTo::Create(m_fDuration, m_fDeltaAngle);
+		pRet = WPJRotateTo::Create(m_fDuration, m_fEndAngle);
 		zone = pNewZone = new WPJZone(pRet);
 	}
 
@@ -353,16 +367,21 @@ WPJRotateTo *WPJRotateTo::Copy()
 WPJRotateTo::WPJRotateTo(float fDuration, float fAngle)
 {
 	m_fDuration = fDuration;
-	m_fDeltaAngle = fAngle;
+	m_fEndAngle = fAngle;
 }
 
 void WPJRotateTo::StartWithTarget(WPJNode *target)
 {
 	WPJIntervalAction::StartWithTarget(target);
 
-	m_fStartAngle = target->GetAngle();
-	m_fEndAngle = m_fDeltaAngle;
-	
+	m_fStartAngle = m_fPreviousAngle = target->GetAngle();
+
+	//	adujst delta angle to the shortest rotate way
+	float t_fDelta = m_fEndAngle - m_fStartAngle;
+	if (fabs(t_fDelta) < MATH_PI)
+		m_fDeltaAngle = t_fDelta;
+	else
+		m_fDeltaAngle = (t_fDelta > 0) ? (t_fDelta - MATH_PI * 2) : (t_fDelta + MATH_PI * 2);
 }
 
 WPJRotateTo *WPJRotateTo::Create(float fDuration, float fAngle)
@@ -417,7 +436,6 @@ WPJWait *WPJWait::Copy()
 	return (WPJWait *)DupCopy(0);
 }
 
-
 void WPJWait::StartWithTarget(WPJNode *target)
 {
 	WPJIntervalAction::StartWithTarget(target);
@@ -452,6 +470,10 @@ WPJWait::~WPJWait()
 WPJSequence::WPJSequence()
 	:m_pAction1(NULL)
 	,m_pAction2(NULL)
+	,m_bInitAction1(false)
+	,m_bInitAction2(false)
+	,m_fLastDt(0)
+	,m_iLastRun(0)
 {
 
 }
@@ -548,13 +570,15 @@ void WPJSequence::StartWithTarget(WPJNode *target)
 {
 	WPJIntervalAction::StartWithTarget(target);
 	
-	// Issue_1 :
-	// This place should need not to call, this will let tick lose efficacy
-	// but if not call this , the action will call StartWithTarget on first time, which
-	// means first dt will be lost
+	//	Issue_1 :
+	//	Use InitAction flag to control can resolve the problem about init when repeat
+	//	, if you use StartWithTarget may let something wrong
 
-	m_pAction1->StartWithTarget(target);
-	m_pAction2->StartWithTarget(target);
+	m_bInitAction1 = false;
+	m_bInitAction2 = false;
+	m_fLastDt = 0;
+	m_fSplit = m_pAction1->GetDuration() / m_fDuration;
+	m_iLastRun = 0;
 }
 
 bool WPJSequence::InitWithTwoActions(WPJFiniteAction *pAction1, WPJFiniteAction *pAction2)
@@ -583,15 +607,110 @@ void WPJSequence::Stop()
 
 void WPJSequence::Update(float dt)
 {
-	if (m_fElapsed < m_pAction1->GetDuration())
+	WPJFiniteAction *t_pRun = NULL;
+	int t_iRun = 0;
+	float t_fNewDt = 0.0f;
+
+	if (dt < m_fSplit)
 	{
-		m_pAction1->Step(dt);
+		//	run action1 and check if it's exist
+		t_iRun = 1;
+		t_pRun = m_pAction1;
+		if (m_fSplit != 0)
+			t_fNewDt = dt / m_fSplit;
+		else
+			t_fNewDt = 1;
 	}
 	else
 	{
-		if (m_pAction2 != NULL)
-			m_pAction2->Step(dt);
+		//	run action2 and check if it's exist
+		t_iRun = 2;
+		t_pRun = m_pAction2;
+		if (m_fSplit == 1)
+			t_fNewDt = 1;
+		else
+			t_fNewDt = (dt - m_fSplit) / (1 - m_fSplit);
 	}
+
+	if (t_iRun == 1)
+	{
+		//	run action1
+		if (!m_bInitAction1 && m_pAction1)
+		{
+			m_pAction1->StartWithTarget(m_pTarget);
+			m_bInitAction1 = true;
+		}
+	}
+	else if (t_iRun == 2)
+	{
+		//	run action2
+		if (m_iLastRun == 0)
+		{
+			//	action1 skip, run directly
+			m_pAction1->StartWithTarget(m_pTarget);
+			m_pAction1->Update(1.0f);
+			m_pAction1->Stop();
+		}
+		else if (m_iLastRun == 1)
+		{
+			//	action1 run finish
+			m_pAction1->Update(1.0f);
+			m_pAction1->Stop();
+		}
+
+		if (!m_bInitAction2 && m_pAction2)
+		{
+			m_pAction2->StartWithTarget(m_pTarget);
+			m_bInitAction2 = true;
+		}
+	}
+
+	t_pRun->Update(t_fNewDt);
+	m_iLastRun = t_iRun;
+
+	//	action 2 skip
+	if (abs(dt - 1.0) < FLT_EPSILON && m_iLastRun == 1)
+	{
+		m_pAction2->StartWithTarget(m_pTarget);
+		m_pAction2->Update(1.0f);
+		m_pAction2->Stop();
+	}
+
+	/*
+	if (!m_bInitAction1 && m_pAction1)
+	{
+		m_bInitAction1 = true;
+		m_pAction1->StartWithTarget(m_pTarget);
+	}
+
+	if (!m_pAction1->IsDone())
+	{
+		m_pAction1->Step((dt - m_fLastDt) * m_fDuration);
+
+		//	Issue 6 : if system is lose efficacy, dt can be so large that bigger than
+		//	this action's duration, so, external time must be back
+		if (m_pAction1->IsDone())
+			m_fElapsed = m_pAction1->GetDuration();
+	}
+	else if (m_pAction2)
+	{
+		if (!m_bInitAction2)
+		{
+			m_bInitAction2 = true;
+			m_pAction2->StartWithTarget(m_pTarget);
+
+			//	Issue 4 : the first action will eat external time, so when 
+			//	the second action begin, it need find back this time
+			m_fLastDt = m_pAction1->GetDuration() / m_fDuration;
+		}
+
+		if (!m_pAction2->IsDone())
+			m_pAction2->Step((dt - m_fLastDt) * m_fDuration);
+	}
+
+	m_fLastDt = dt;
+	*/
+
 }
 
 WPJSequence::~WPJSequence()
@@ -604,6 +723,9 @@ WPJSequence::~WPJSequence()
 //////////////////////////////////////////////////////////////////////////
 
 WPJSpawn::WPJSpawn()
+	:m_pAction1(NULL)
+	,m_pAction2(NULL)
+
 {
 
 }
@@ -664,10 +786,12 @@ void WPJSpawn::Stop()
 
 void WPJSpawn::Update(float dt)
 {
-	m_pAction1->Step(dt);
-
+	if (m_pAction1)
+		m_pAction1->Update(dt);
+	
 	if (m_pAction2)
-		m_pAction2->Step(dt);
+		m_pAction2->Update(dt);
+
 }
 
 bool WPJSpawn::InitWithTwoActions(WPJFiniteAction *pAction1, WPJFiniteAction *pAction2)
@@ -675,13 +799,20 @@ bool WPJSpawn::InitWithTwoActions(WPJFiniteAction *pAction1, WPJFiniteAction *pA
 	ASSERT(pAction1 != NULL);
 	ASSERT(pAction2 != NULL);
 
-	m_fDuration = max(pAction1->GetDuration(), pAction2->GetDuration());
+	float t_fDuration1 = pAction1->GetDuration();
+	float t_fDuration2 = pAction2->GetDuration();
+	m_fDuration = max(t_fDuration1, t_fDuration2);
 
 	m_pAction1 = pAction1;
-	WPJ_SAFE_RETAIN(pAction1);
-
 	m_pAction2 = pAction2;
-	WPJ_SAFE_RETAIN(pAction2);
+
+	if (t_fDuration1 > t_fDuration2)
+		m_pAction2 = WPJSequence::CreateWithTwoActions(pAction2, WPJWait::Create(t_fDuration1 - t_fDuration2));
+	else if (t_fDuration2 > t_fDuration1)
+		m_pAction1 = WPJSequence::CreateWithTwoActions(pAction1, WPJWait::Create(t_fDuration2 - t_fDuration1));
+
+	WPJ_SAFE_RETAIN(m_pAction1);
+	WPJ_SAFE_RETAIN(m_pAction2);
 	
 	return true;
 }
@@ -753,6 +884,7 @@ void WPJRepeat::StartWithTarget(WPJNode *target)
 {
 	WPJIntervalAction::StartWithTarget(target);
 
+	m_iCompleteCount = 0;
 	m_pRepeatAction->StartWithTarget(target);
 }
 
@@ -791,6 +923,7 @@ void WPJRepeat::InitWithAction(WPJFiniteAction *pAction, int iRepeatCount)
 
 	//	set the duration of WPJRepeat
 	m_fDuration = pAction->GetDuration() * iRepeatCount;
+	m_fNextDt = pAction->GetDuration() / m_fDuration;
 
 	WPJ_SAFE_RETAIN(pAction);
 }
@@ -818,17 +951,58 @@ void WPJRepeat::Stop()
 
 void WPJRepeat::Update(float dt)
 {
-	int iNextChange = m_pRepeatAction->GetDuration() * (m_iCompleteCount + 1);
-	m_pRepeatAction->Step(dt);
-
-	if (m_fElapsed > iNextChange)
+	if (dt >= m_fNextDt)
 	{
+		//	if dt is too large that can repeat at least one times
+		while (dt > m_fNextDt && m_iCompleteCount < m_iRepeatCount)
+		{
+			m_pRepeatAction->Update(1.0f);
+			++m_iCompleteCount;
+
+			m_pRepeatAction->Stop();
+			m_pRepeatAction->StartWithTarget(m_pTarget);
+			m_fNextDt += m_pRepeatAction->GetDuration() / m_fDuration;
+		}
+
+		//	Fix Issue 7, incorecct end value
+		if (dt >= 1.0f && m_iCompleteCount < m_iRepeatCount)
+			++m_iCompleteCount;
+
+		if (m_iCompleteCount == m_iRepeatCount)
+		{
+			m_pRepeatAction->Update(1.0f);
+			m_pRepeatAction->Stop();
+		}
+		else
+		{
+			m_pRepeatAction->Update(fmodf(dt * m_iRepeatCount, 1.0f));;
+		}
+	}
+	else
+	{
+		m_pRepeatAction->Update(fmodf(dt * m_iRepeatCount, 1.0f));
+	}
+		
+	/*
+	m_pRepeatAction->Step((dt - m_fLastDt) * m_fDuration);
+
+	if (m_pRepeatAction->IsDone())
+	{
+		//	Issue 7 : Let this action finish
+		m_pRepeatAction->Update(1.0f);
+
 		m_pRepeatAction->Stop();
 		m_pRepeatAction->StartWithTarget(m_pTarget);
-
 		m_iCompleteCount++;
+
+		//	Issue 6
+		m_fElapsed = m_pRepeatAction->GetDuration() * m_iCompleteCount;
+		m_fLastDt = m_fElapsed / m_fDuration;
+		
 	}
-	
+	else
+		m_fLastDt = dt;
+	*/
 }
 
 WPJRepeat::~WPJRepeat()

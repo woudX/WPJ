@@ -1,12 +1,14 @@
 #include "WPJAppDelegate.h"
 #include "WPJGarbageCollection.h"
-#include <random>
+
 
 #include "WPJTest.h"
 #include "WPJIntervalAction.h"
+#include "WPJInstantAction.h"
 #include "WPJActionManager.h"
 #include "WPJSprite.h"
 #include "WPJTextureManager.h"
+
 
 USING_NS_WPJ
 
@@ -108,7 +110,7 @@ int WPJAppDelegate::Run()
 	WPJPoint origin = pDirector->GetViewOriginPoint();
 	WPJSize size = pDirector->GetViewSize();
 
-	// 初始化精灵-白
+	/*// 初始化精灵-白
 	
 	WPJMoveTo *moveByAction = WPJMoveTo::Create(5, WPJPoint(WPJDirector::GetSharedInst()->GetViewSize().width - 75,WPJDirector::GetSharedInst()->GetViewSize().height - 75));
 	WPJRotateBy *rotateBy = WPJRotateBy::Create(10, 3.14 * 3);
@@ -118,31 +120,43 @@ int WPJAppDelegate::Run()
 	sprite->InitWithFile("white.png");
 	sprite->SetPosition(75, 75);
 	sprite->RunAction(spawn);
+*/
 
 	
 	//	初始化精灵黄
-	WPJRotateBy *rotateByAction = WPJRotateBy::Create(2, 3.14);
-	WPJIntervalAction *reverseBy = rotateByAction->Reverse();
-	WPJMoveBy *moveBy = WPJMoveBy::Create(3, _npoint(origin.x + size.width - 150, 0));
+	WPJMoveBy *moveBy = WPJMoveBy::Create(2, _npoint(origin.x + size.width - 150, 0));
+	WPJMoveTo *moveTo = WPJMoveTo::Create(3, _npoint(origin.x + size.width - 75, 75));
+	WPJRotateBy *rotateBy = WPJRotateBy::Create(3, MATH_PI * 2.25);
+	WPJRotateTo *rotateTo = WPJRotateTo::Create(2, deg_std(50));
+	WPJIntervalAction *reverseBy = rotateBy->Reverse();
+	WPJPlaceBy *placeBy = WPJPlaceBy::Create(_npoint(origin.x + 300, 0));
+	WPJPlaceBy *placeBy2 = WPJPlaceBy::Create(-_npoint((origin.x + size.width - 150 )/ 2, 0));
+
 	WPJWait *waitAction = WPJWait::Create(2.0);
 	WPJSequence *laihui = WPJSequence::Create(reverseBy, moveBy, waitAction, reverseBy->Reverse(), moveBy->Reverse(), NULL);
-	WPJRepeat *rRepeat = WPJRepeat::Create(laihui, 10);
+	WPJSequence *seq = WPJSequence::CreateWithTwoActions(reverseBy, reverseBy->Reverse());
+	//WPJRepeat *rRepeat = WPJRepeat::Create(laihui, 10);
 	WPJSprite *sprite_2 = WPJSprite::Create();
 
-	WPJIntervalAction *reverseBy_2 = rotateByAction->Reverse();
+	WPJIntervalAction *reverseBy_2 = rotateBy->Reverse();
 	WPJMoveTo *moveByAction_2 = WPJMoveTo::Create(3, WPJPoint(origin.x + size.width - 75, origin.y + 75));
-	WPJSpawn *spawn_2 = WPJSpawn::Create(reverseBy_2, moveByAction_2, NULL);
-	WPJSequence *sequence = WPJSequence::Create(reverseBy, spawn_2, waitAction, rotateByAction, NULL);
+	WPJSpawn *spawn_2 = WPJSpawn::CreateWithTwoActions(reverseBy_2, moveByAction_2);
 
+	WPJSpawn *backAndRotate = WPJSpawn::CreateWithTwoActions(reverseBy->Copy(),placeBy2);
+	WPJSequence *sequence = WPJSequence::Create(
+		moveBy,reverseBy,
+		backAndRotate, backAndRotate, NULL);
 
-	sprite_2->InitWithFile("white.png");
-	sprite_2->SetAngle(0);
-	sprite_2->UpdateDisplayOpacity(100);
-	sprite_2->UpdateDisplayColor(wpColor3B(255, 255, 0));
+	float dt = 0;
+	sprite_2->InitWithFile("4color.png");
+	sprite_2->SetAngle(deg_std(270));
+	sprite_2->UpdateDisplayOpacity(255);
+	sprite_2->UpdateDisplayColor(wpColor3B(255, 255, 255));
 	sprite_2->SetCoordinateSystem(WPJ_COORDINATE_RELATIVE);
 	sprite_2->SetBlendFunc(new_blend(AL_FUNC_ADD, AL_SRC_ALPHA, AL_SRC_COLOR));
 	sprite_2->SetPosition(WPJPoint(origin.x + 75, origin.y + 75));
-	sprite_2->RunAction(rRepeat);
+	sprite_2->RunAction(WPJRepeat::Create(sequence, 3));
+/*
 
 	// 初始化复制的精灵
 	WPJSprite *copySprite = sprite_2->Copy();
@@ -167,7 +181,7 @@ int WPJAppDelegate::Run()
 	border->SetIgnoreAnchorPoint(true);
 	border->UpdateDisplayColor(wpc3(255, 0, 0));
 	border->SetScale(WPJALGOManager::GetSharedInst()->GetScaleX(), WPJALGOManager::GetSharedInst()->GetScaleY());
-	border->Retain();
+	border->Retain();*/
 	/************************************************************************/
 	/* Test Area End                                                        */
 	/************************************************************************/
@@ -187,6 +201,10 @@ int WPJAppDelegate::Run()
 				}
 				else if (e.keyboard.keycode == ALLEGRO_KEY_ENTER)
 					bPause = !bPause;
+				else if (e.keyboard.keycode == ALLEGRO_KEY_LEFT)
+					dt -= 0.1;
+				else if (e.keyboard.keycode == ALLEGRO_KEY_RIGHT)
+					dt += 0.1;
 				else
 					WPJLOG("[%s] 从键盘输入 ... %d\n", _D_NOW_TIME__, e.keyboard.keycode);
 		}
@@ -205,12 +223,13 @@ int WPJAppDelegate::Run()
 			//////////////////////////////////////////////////////////////////////////
 			al_clear_to_color(al_map_rgb_f(0,0,0));
 
-			border->Draw();
+			/*border->Draw();
 			background->Draw();
 			sprite->Draw();
-			copySprite->Draw();
+			copySprite->Draw();*/
+			//sprite_2->SetAngle(dt);
 			sprite_2->Draw();
-			
+
 			al_flip_display();
 
 			//	release autorelease pool

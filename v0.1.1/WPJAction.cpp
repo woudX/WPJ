@@ -47,17 +47,17 @@ WPJAction *WPJAction::Copy()
 
 void WPJAction::Update(float dt)
 {
-	WPJLOG("[%s] Please inherite method!", _D_NOW_TIME__);
+	WPJLOG("[%s] Please inherite method!\n", _D_NOW_TIME__);
 }
 
 void WPJAction::Step(float dt)
 {
-	WPJLOG("[%s] Please Inherite method!", _D_NOW_TIME__);
+	WPJLOG("[%s] Please Inherite method!\n", _D_NOW_TIME__);
 }
 
 void WPJAction::Stop()
 {
-	WPJLOG("[%s] Please Inherite update method!", _D_NOW_TIME__);
+	m_pTarget = NULL;
 }
 
 bool WPJAction::IsDone()

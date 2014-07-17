@@ -25,7 +25,6 @@ public:
 	virtual WPJObject *DupCopy(WPJZone *zone);
 	WPJIntervalAction *Copy();
 
-	virtual void Stop();
 	virtual void Step(float dt);
 	virtual WPJIntervalAction *Reverse();
 	virtual bool IsDone();
@@ -62,8 +61,8 @@ public:
 	static WPJMoveBy *Create(float fDuration, const WPJPoint& deltaPos);
 protected:
 	WPJPoint m_obDeltaPositon;
-	WPJPoint m_obStartPoint;
-	WPJPoint m_obEndPoint;
+	WPJPoint m_obStartPosition;
+	WPJPoint m_obPreviousPosition;
 };
 
 /*
@@ -78,10 +77,12 @@ public:
 
 	virtual WPJObject *DupCopy(WPJZone *zone);
 	WPJMoveTo *Copy();
-
 	virtual void StartWithTarget(WPJNode *target);
 
 	static WPJMoveTo *Create(float fDuration, const WPJPoint& endPosition);
+
+private:
+	WPJPoint m_obEndPosition;
 };
 
 /**
@@ -91,6 +92,8 @@ public:
 class WPJRotateBy : public WPJIntervalAction
 {
 public:
+	static WPJRotateBy *Create(float fDuration, float fAngle);
+
 	WPJRotateBy();
 	WPJRotateBy(float fDuration, float fAngle);
 	virtual ~WPJRotateBy();
@@ -103,11 +106,10 @@ public:
 	virtual void Update(float dt);
 	virtual void Stop();
 
+protected:
 	float m_fDeltaAngle;
 	float m_fStartAngle;
-	float m_fEndAngle;
-
-	static WPJRotateBy *Create(float fDuration, float fAngle);
+	float m_fPreviousAngle;
 };
 
 /**
@@ -127,6 +129,9 @@ public:
 	virtual void StartWithTarget(WPJNode *target);
 
 	static WPJRotateTo *Create(float fDuration, float fAngle);
+
+protected:
+	float m_fEndAngle;
 };
 
 /**
@@ -181,6 +186,10 @@ public:
 	static WPJSequence *CreateWithVariableList(WPJFiniteAction *pAction1, va_list args);
 private:
 	WPJFiniteAction *m_pAction1, *m_pAction2;
+	bool m_bInitAction1, m_bInitAction2;
+	float m_fLastDt;
+	float m_fSplit;
+	int m_iLastRun;
 };
 
 /**
@@ -236,6 +245,8 @@ private:
 	WPJFiniteAction *m_pRepeatAction;
 	int m_iRepeatCount;
 	int m_iCompleteCount;
+	float m_fNextDt;
+
 };
 
 

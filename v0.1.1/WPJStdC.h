@@ -8,10 +8,15 @@
 #include <assert.h>
 #include <float.h>
 
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#endif
+
 #ifndef __MINGW32__
 
 #define MAX		std::max
 #define MIN		std::min
+
 
 #else
 

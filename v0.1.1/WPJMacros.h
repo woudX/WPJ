@@ -45,15 +45,22 @@
 #define WPJ_SAFE_RELEASE(p) do { if (p) { (p)->Release(); } } while (0)
 #define WPJ_SAFE_RELEASE_NULL(p) do { if (p) { (p)->Release(); (p) = NULL; } } while(0)
 
-
 #define POOL_MAX_SIZE 500
 
-
-
-
-
+/// Debug define
+//////////////////////////////////////////////////////////////////////////
 #define _D_NOW_TIME__	WPJTime::NowTime()
 
+/// Additional define
+//////////////////////////////////////////////////////////////////////////
+
+//	WPJEngine provide WPJ_ENABLED_ACTION_STACK to control action, the actions
+//	run at the same time which are same kinds will composition
+//	This switch default is open, you can close it to cancel composition, but 
+//	we are not recommend, when it's closed, only the last actions will effect
+#ifndef WPJ_ENABLED_ACTION_STACK
+#define WPJ_ENABLED_ACTION_STACK 1
+#endif
 
 /// container迭代器宏定义
 //////////////////////////////////////////////////////////////////////////
@@ -81,16 +88,16 @@
 	}\
 	container.clear();
 
-/// 数据结构定义
+/// data define
 //////////////////////////////////////////////////////////////////////////
 typedef unsigned int U_INT;
 typedef unsigned char U_CHAR;
 #define U_INT_MAX 0xffffffff
 #define MAX_STRING_LEN	(1024 * 100)
-
 #define WPJRepeatForever U_INT_MAX - 1
-
-#define FLT_EPSILON     1.192092896e-07F
+#ifndef FLT_EPSILON
+#define FLT_EPSILON     1.192092896e-07F	
+#endif
 
 #define UN_USED_PARAM(...)
 

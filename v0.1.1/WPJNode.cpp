@@ -217,7 +217,8 @@ float WPJNode::GetAngle()
 
 void WPJNode::SetAngle(float var)
 {
-	m_fAngle = var;
+	m_fAngle = var;	
+	// (var > 0) ? (fmodf(var, MATH_PI * 2)) : (fmodf(var, MATH_PI * 2) + MATH_PI * 2);
 }
 
 bool WPJNode::IsRunning()
