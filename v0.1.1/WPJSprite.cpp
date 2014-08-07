@@ -239,10 +239,6 @@ bool WPJSprite::IsCascadeOpacityEnabled()
 
 WPJPoint WPJSprite::RelativeConvertToAllegro()
 {
-	SetContentSize(_nsize(m_pTexture->GetWidth() * m_fScaleX, m_pTexture->GetHeight() * m_fScaleY));
-
-	return WPJNode::RelativeConvertToAllegro();
-
 	WPJPoint t_obAllegroPoint = WPJPointZero;
 	WPJPoint t_obWorldPoint = RelativeConvertToWorld();
 

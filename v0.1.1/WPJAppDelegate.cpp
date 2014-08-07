@@ -1,6 +1,6 @@
 #include "WPJAppDelegate.h"
 #include "WPJGarbageCollection.h"
-#include "WPJFileUtil.h"
+
 
 #include "WPJTest.h"
 #include "WPJIntervalAction.h"
@@ -8,8 +8,7 @@
 #include "WPJActionManager.h"
 #include "WPJSprite.h"
 #include "WPJTextureManager.h"
-#include "WPJScriptSupport.h"
-#include "DemoScene.h"
+
 
 USING_NS_WPJ
 
@@ -43,31 +42,13 @@ bool WPJAppDelegate::ApplicationDidFinishLaunching()
 bool WPJAppDelegate::Initialization()
 {
 	WPJDirector *t_pDirector = WPJDirector::GetSharedInst();
-	// Set FPS, default value is 1.0 / 60
-	t_pDirector->SetAnimationInterval(1.0 / 60);
-
-	/// Init Draw engine
-	//////////////////////////////////////////////////////////////////////////
 	WPJALGOManager *t_pALGOManager = WPJALGOManager::GetSharedInst();
 	t_pALGOManager->SetDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, wResolutionShowAll);
 
+	// Set FPS, default value is 1.0 / 60
+	t_pDirector->SetAnimationInterval(1.0 / 60);
 
-	/// Init Platform
-	//////////////////////////////////////////////////////////////////////////
-	WPJFileUtil *pFileUtil = WPJFileUtil::GetSharedInst();
-	pFileUtil->AddSearchPath("data/windows/");
-	pFileUtil->AddSearchResolution("music/");
-	pFileUtil->AddSearchResolution("image/");
-	pFileUtil->AddSearchResolution("script/");
-
-	/// Init Support - Lua
-	//////////////////////////////////////////////////////////////////////////
-	WPJScriptManager *t_pScriptManager = WPJScriptManager::GetsharedInst();
-	t_pScriptManager->SetScriptEngine(new WPJScriptProtocol());
-	t_pScriptManager->GetScriptEngine()->Open();
-
-	/// User customed init
-	//////////////////////////////////////////////////////////////////////////
+	// User customed init
 	if (!ExtendInit())
 	{
 		WPJLOG("[%s] WPJAppDelegate ... error in ExtendInit\n", _D_NOW_TIME__);
@@ -84,8 +65,9 @@ bool WPJAppDelegate::Initialization()
 	}
 
 	// Init Scene
-	WPJScene *t_pScene = DemoScene::CreateNewObject();
+	WPJScene *t_pScene = WPJScene::CreateNewObject();
 	t_pDirector->RunWithScene(t_pScene);
+	t_pScene->Release();
 
 	return true;
 }
@@ -121,6 +103,94 @@ int WPJAppDelegate::Run()
 		return 0;
 	}
 
+	/************************************************************************/
+	/* Test Area                                                            */
+	/************************************************************************/
+	WPJDirector *pDirector = WPJDirector::GetSharedInst();
+	WPJPoint origin = pDirector->GetViewOriginPoint();
+	WPJSize size = pDirector->GetViewSize();
+
+	/*// 初始化精灵-白
+	
+	WPJMoveTo *moveByAction = WPJMoveTo::Create(5, WPJPoint(WPJDirector::GetSharedInst()->GetViewSize().width - 75,WPJDirector::GetSharedInst()->GetViewSize().height - 75));
+	WPJRotateBy *rotateBy = WPJRotateBy::Create(10, 3.14 * 3);
+	WPJSpawn *spawn = WPJSpawn::Create(moveByAction, rotateBy, NULL);
+	
+	WPJSprite *sprite = WPJSprite::Create();
+	sprite->InitWithFile("white.png");
+	sprite->SetPosition(75, 75);
+	sprite->RunAction(spawn);
+*/
+
+	
+	//	初始化精灵黄
+	WPJMoveBy *moveBy = WPJMoveBy::Create(2, _npoint(origin.x + size.width - 150, 0));
+	WPJMoveTo *moveTo = WPJMoveTo::Create(3, _npoint(origin.x + size.width - 75, 75));
+	WPJRotateBy *rotateBy = WPJRotateBy::Create(3, MATH_PI * 2.25);
+	WPJRotateTo *rotateTo = WPJRotateTo::Create(2, deg_std(50));
+	WPJIntervalAction *reverseBy = rotateBy->Reverse();
+	WPJPlaceBy *placeBy = WPJPlaceBy::Create(_npoint(origin.x + 300, 0));
+	WPJPlaceBy *placeBy2 = WPJPlaceBy::Create(-_npoint((origin.x + size.width - 150 )/ 2, 0));
+
+	WPJWait *waitAction = WPJWait::Create(2.0);
+	WPJSequence *laihui = WPJSequence::Create(reverseBy, moveBy, waitAction, reverseBy->Reverse(), moveBy->Reverse(), NULL);
+	WPJSequence *seq = WPJSequence::CreateWithTwoActions(reverseBy, reverseBy->Reverse());
+	//WPJRepeat *rRepeat = WPJRepeat::Create(laihui, 10);
+	WPJSprite *sprite_2 = WPJSprite::Create();
+
+	WPJIntervalAction *reverseBy_2 = rotateBy->Reverse();
+	WPJMoveTo *moveByAction_2 = WPJMoveTo::Create(3, WPJPoint(origin.x + size.width - 75, origin.y + 75));
+	WPJSpawn *spawn_2 = WPJSpawn::CreateWithTwoActions(reverseBy_2, moveByAction_2);
+
+	WPJSpawn *backAndRotate = WPJSpawn::CreateWithTwoActions(reverseBy->Copy(),placeBy2);
+
+	WPJCallFunc *callFunc = WPJCallFunc::Create(WPJNodeTest::CreateNewObject(), 
+		callfunc_selector(WPJNodeTest::Test));
+
+	WPJSequence *sequence = WPJSequence::Create(
+		moveBy,reverseBy,
+		backAndRotate, backAndRotate,callFunc, NULL);
+
+	float dt = 0;
+	sprite_2->InitWithFile("4color.png");
+	sprite_2->SetAngle(deg_std(270));
+	sprite_2->UpdateDisplayOpacity(255);
+	sprite_2->UpdateDisplayColor(wpColor3B(255, 255, 255));
+	sprite_2->SetCoordinateSystem(WPJ_COORDINATE_RELATIVE);
+	sprite_2->SetBlendFunc(new_blend(AL_FUNC_ADD, AL_SRC_ALPHA, AL_SRC_COLOR));
+	sprite_2->SetPosition(WPJPoint(origin.x + 75, origin.y + 75));
+	sprite_2->RunAction(WPJRepeat::Create(sequence, 3));
+
+/*
+	// 初始化复制的精灵
+	WPJSprite *copySprite = sprite_2->Copy();
+	copySprite->UpdateDisplayColor(wpc3(0,0,255));
+	copySprite->SetPosition(_npoint(origin.x + 75, origin.y + 400));
+	WPJSequence *copySequenceAction = sequence->Copy();
+	copySprite->RunAction(copySequenceAction);
+
+	// 初始化背景图片精灵
+	WPJSprite *background = WPJSprite::Create();
+	background->InitWithFile("background.png");
+	// background->SetIgnoreAnchorPoint(true);
+	background->SetPosition(origin.x + size.width / 2, origin.y + size.height / 2);
+	background->UpdateDisplayColor(wpc3(100, 100, 100));
+	background->SetScale(size.width / 800, size.height / 600);
+	background->Retain();
+
+	// 初始化边界精灵
+	WPJSprite *border = WPJSprite::Create();
+	border->InitWithFile("background.png");
+	border->SetPosition(0, 0);
+	border->SetIgnoreAnchorPoint(true);
+	border->UpdateDisplayColor(wpc3(255, 0, 0));
+	border->SetScale(WPJALGOManager::GetSharedInst()->GetScaleX(), WPJALGOManager::GetSharedInst()->GetScaleY());
+	border->Retain();*/
+	/************************************************************************/
+	/* Test Area End                                                        */
+	/************************************************************************/
+	float t2 = 0;
+	bool bPause = false;
 	while (1) 
 	{
 		if ( WPJALGOManager::GetSharedInst()->WaitForEvent(e))
@@ -133,6 +203,12 @@ int WPJAppDelegate::Run()
 					Exit();
 					break;
 				}
+				else if (e.keyboard.keycode == ALLEGRO_KEY_ENTER)
+					bPause = !bPause;
+				else if (e.keyboard.keycode == ALLEGRO_KEY_LEFT)
+					dt -= 0.1;
+				else if (e.keyboard.keycode == ALLEGRO_KEY_RIGHT)
+					dt += 0.1;
 				else
 					WPJLOG("[%s] 从键盘输入 ... %d\n", _D_NOW_TIME__, e.keyboard.keycode);
 		}
@@ -143,30 +219,51 @@ int WPJAppDelegate::Run()
 		if (t_obLINow.QuadPart - t_obLILast.QuadPart > m_liAnimationInterval.QuadPart)
 		{
 			t_obLILast.QuadPart = t_obLINow.QuadPart;
-			
+
 			// Run MainLoop
 			WPJDirector::GetSharedInst()->MainLoop();
+
+			// Only For Test
+			//////////////////////////////////////////////////////////////////////////
+			al_clear_to_color(al_map_rgb_f(0,0,0));
+
+			/*border->Draw();
+			background->Draw();
+			sprite->Draw();
+			copySprite->Draw();*/
+			//sprite_2->SetAngle(dt);
+			sprite_2->Draw();
+
+			al_flip_display();
 
 			//	release autorelease pool
 			WPJGC::GetSharedInst()->Pop();
 
 			//	garbage collection
 			WPJGC::GetSharedInst()->GC();
+			
+			/*
+			if (!reverseBy->IsDone())
+				WPJLOG("[%s]Node (%f, %f)\n",
+					_D_NOW_TIME__,
+					sprite_2->RelativeConvertToAllegro().x,
+					sprite_2->RelativeConvertToAllegro().y
+				);
+				*/
 		}
 		else
 		{
 			Sleep(0);
 		}	
 	}
+
 	return 0;
 }
 
 int WPJAppDelegate::Exit()
 {
-	WPJScriptManager::GetsharedInst()->GetScriptEngine()->Close();
-	delete WPJScriptManager::GetsharedInst();
+	// WPJTextureManager::GetSharedInst()->GC();
 	WPJALGOManager::GetSharedInst()->DestroyALGO();
-	delete WPJFileUtil::GetSharedInst();
 	delete WPJTextureManager::GetSharedInst();
 	delete WPJALGOManager::GetSharedInst();
 	delete WPJDirector::GetSharedInst();

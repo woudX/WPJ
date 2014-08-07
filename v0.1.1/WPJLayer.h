@@ -22,8 +22,9 @@ public:
 	~WPJLayer();
 
 	static WPJLayer *CreateNewObject();
-	WPJLayer *Copy();
-	virtual WPJObject *DupCopy(WPJZone *zone);
+	virtual void GetSharedPtr(WPJLayer* &object);
+	virtual WPJLayer *GetCopiedPtr();
+	virtual WPJLayer *DupCopy();
 };
 
 /**
@@ -36,8 +37,9 @@ public:
 	WPJLayerRGBA();
 	~WPJLayerRGBA();
 	static WPJLayerRGBA *CreateNewObject();
-	WPJLayerRGBA *Copy();
-	virtual WPJObject *DupCopy(WPJZone *zone);
+	virtual void GetSharedPtr(WPJLayerRGBA* &object);
+	virtual WPJLayerRGBA *GetCopiedPtr();
+	virtual WPJLayerRGBA *DupCopy();
 
 	virtual U_CHAR GetOpacity();
 	virtual void SetOpacity(U_CHAR opacity);
@@ -65,47 +67,8 @@ protected:
 	U_CHAR m_obRealOpacity;
 	wpColor3B m_obDisplayColor;
 	wpColor3B m_obRealColor;
-	bool m_bOpacityModifyRGB;
 	bool m_bCascadeColorEnabled;
 	bool m_bCascadeOpacityEnabled;
-};
-
-/**
- *	WPJLayerColor is a subclass of WPJLayerRGBA, implements WPJBlendProtocol
- *	It contains : layer_color , blender and change size
- */
-class WPJLayerColor : public WPJLayerRGBA, public WPJBlendProtocol
-{
-public:
-	WPJLayerColor();
-
-	//	Create a WPJLayerColor with size
-	static WPJLayerColor *CreateNewObject(float width, float height);
-
-	//	Create a WPJLyaerColor with size and RGB
-	static WPJLayerColor *CreateNewObject(float width, float height, wpColor3B &rgb);
-	
-	//	Create a WPJLayerColor with size and RGBA
-	static WPJLayerColor *CreateNewObject(float width ,float height, wpColor3B &rgb, U_CHAR alpha);
-
-
-	//	Set/Get blendfunc
-	virtual void SetBlendFunc(wpBlendFunc blendFunc);
-	virtual wpBlendFunc GetBlendFunc();
-
-	//	Change layer size
-	void ChangeWidth(float width);
-	void ChangeHeight(float height);
-
-	WPJPoint RelativeConvertToAllegro();
-
-	//	Draw Layer
-	virtual void Draw();
-
-	~WPJLayerColor();
-
-protected:
-	wpBlendFunc m_obBlendFunc;
 };
 
 

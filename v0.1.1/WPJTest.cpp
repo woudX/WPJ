@@ -1,6 +1,6 @@
 #include "WPJTest.h"
 #include "WPJGarbageCollection.h"
-#include "WPJLib.h"
+
 USING_NS_WPJ
 
 WPJNodeTest *WPJNodeTest::CreateNewObject()
