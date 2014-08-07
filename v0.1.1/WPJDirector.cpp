@@ -1,6 +1,8 @@
 #include "WPJDirector.h"
 #include "WPJAppDelegate.h"
 #include "WPJActionManager.h"
+#include "WPJScriptSupport.h"
+
 USING_NS_WPJ
 
 WPJDirector *WPJDirector::m_pInst = 0;
@@ -27,6 +29,16 @@ void WPJDirector::SetScheduler(WPJScheduler* var)
 	}
 }
 
+WPJScriptManager *WPJDirector::GetScriptManager()
+{
+	return m_pScriptManager;
+}
+
+WPJScriptProtocol *WPJDirector::GetScriptEngine()
+{
+	return m_pScriptManager->GetScriptEngine();
+}
+
 WPJALGOManager *WPJDirector::GetALGOManager()
 {
 	return m_pALGOManager;
@@ -36,6 +48,7 @@ WPJDirector::WPJDirector()
 :m_pScheduler(WPJScheduler::CreateNewObject())
 ,m_pALGOManager(WPJALGOManager::GetSharedInst())
 ,m_pActionManager(WPJActionManager::GetsharedInst())
+,m_pScriptManager(WPJScriptManager::GetsharedInst())
 ,m_bPause(false)
 ,m_bExit(false)
 ,m_bTimeStart(true)
@@ -187,6 +200,10 @@ void WPJDirector::Draw()
 	m_pActionManager->Update(m_fDeltaTime);
 
 	// draw, using visit()
+	al_clear_to_color(al_map_rgb_f(0,0,0));
+	m_pNextScene->Visit();
+	al_flip_display();
+
 	ShowStatus();
 }
 

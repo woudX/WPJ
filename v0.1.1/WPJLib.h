@@ -10,4 +10,12 @@
 // math
 #include "WPJGeometry.h"
 
+// support
+
+// platform
+#include "WPJFileUtil.h"
+
+// core
+#include "WPJDirector.h"
+
 #endif

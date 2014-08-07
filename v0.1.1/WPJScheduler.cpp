@@ -1,5 +1,7 @@
 #include "WPJScheduler.h"
 #include "WPJGarbageCollection.h"
+#include "WPJDirector.h"
+#include "WPJLib.h"
 
 USING_NS_WPJ
 

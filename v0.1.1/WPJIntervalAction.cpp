@@ -1,5 +1,6 @@
 #include "WPJIntervalAction.h"
 #include "WPJGarbageCollection.h"
+#include "WPJLib.h"
 
 USING_NS_WPJ
 

@@ -1,5 +1,6 @@
 #include "WPJTexture2D.h"
 #include "WPJGarbageCollection.h"
+#include "WPJLib.h"
 
 USING_NS_WPJ
 
