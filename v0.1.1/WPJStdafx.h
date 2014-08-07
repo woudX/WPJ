@@ -7,5 +7,6 @@
 #include <stack>
 #include <map>
 #include <random>
+#include <string>
 
 #endif

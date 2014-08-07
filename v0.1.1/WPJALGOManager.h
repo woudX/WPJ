@@ -5,7 +5,6 @@
 #include "WPJMacros.h"
 #include "WPJGeometry.h"
 #include "WPJString.h"
-#include "WPJLib.h"
 #include "WPJALGOProtocol.h"
 #include <allegro5/allegro.h>
 #include <allegro5/blender.h>

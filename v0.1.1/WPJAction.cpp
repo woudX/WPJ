@@ -1,6 +1,6 @@
 #include "WPJAction.h"
 #include "WPJGarbageCollection.h"
-
+#include "WPJLib.h"
 USING_NS_WPJ
 
 /// WPJAction

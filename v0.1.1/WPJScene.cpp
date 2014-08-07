@@ -3,19 +3,13 @@
 
 USING_NS_WPJ
 
-void WPJScene::GetSharedPtr(WPJScene* &object)
-{
-	object = this;
-	object->Retain();
-}
-
 WPJScene *WPJScene::CreateNewObject()
 {
 	WPJScene *t_pScene = new WPJScene();
 
 	if (t_pScene && t_pScene->Init())
 	{
-		WPJGC::GetSharedInst()->AddPtr(t_pScene);
+		t_pScene->AutoRelease();
 		return t_pScene;
 	}
 	else
