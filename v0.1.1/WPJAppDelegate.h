@@ -29,9 +29,7 @@ protected:
 	WPJAppDelegate();
 private:
 	static WPJAppDelegate *m_pAppDelegate;
-	
 	int Exit();
-
 	LARGE_INTEGER m_liAnimationInterval;
 };
 

@@ -1,6 +1,6 @@
 #include "WPJString.h"
 #include "WPJGarbageCollection.h"
-
+#include "WPJLib.h"
 USING_NS_WPJ
 
 HString::HString():m_obStr(""),hashCode(0)

@@ -172,6 +172,24 @@ WPJGC::~WPJGC()
 	
 #if GC_TYPE == GC_OPEN
 	//	release all object
+
+	int tGCnum;
+	do 
+	{
+		tGCnum = 0;
+		foreach_in_list(WPJObject*, itor, m_GCList)
+		{
+			if (pp(itor)->GetReference() == 1)
+			{
+				WPJ_SAFE_RELEASE(pp(itor));
+				itor = m_GCList.erase(itor);
+				tGCnum++;
+			}
+			else
+				itor++;
+		} 
+	} while (tGCnum != 0);
+	
 	foreach_in_list_auto(WPJObject*, itor, m_GCList)
 	{
 		while (ptr_data(itor) && pp(itor)->GetReference() > 1)	// m_uRef = 1
@@ -179,6 +197,7 @@ WPJGC::~WPJGC()
 
 		WPJ_SAFE_RELEASE(ptr_data(itor));// m_uRef = 0
 	}
+	
 
 #endif // GC_OPEN
 	

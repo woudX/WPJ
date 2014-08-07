@@ -1,4 +1,5 @@
 #include "WPJInstantAction.h"
+#include "WPJLib.h"
 
 USING_NS_WPJ
 
