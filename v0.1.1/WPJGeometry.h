@@ -196,7 +196,7 @@ public:
 #define _nRect(x,y,width,height) WPJRect((float)(x),float(y),float(width),float(height))
 
 static WPJPoint WPJPointZero = _npoint(0,0);
-static WPJSize WPJSizeZero = _nsize(0,0);
+static WPJSize WPJPointSize = _nsize(0,0);
 static WPJRect WPJRectZero = _nRect(0,0,0,0);
 
 NS_WPJ_END

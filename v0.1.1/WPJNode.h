@@ -6,6 +6,7 @@
 #include "WPJScheduler.h"
 
 #include "WPJGeometry.h"
+#include "WPJLib.h"
 #include "WPJProtocols.h"
 
 NS_WPJ_BEGIN
@@ -148,11 +149,6 @@ public:
 	// Visits this node's children and draw them recursively
 	virtual void Visit();
 
-	// Sort all childrens by iOrder, bigger order will draw after
-	virtual void SortAllChildren();
-	bool CmpMethod(const WPJNode *a, const WPJNode *b);
-	bool operator() (const WPJNode *a, const WPJNode *b);
-
 	//	After ignore anchor point, node's final position will only consider position but not 
 	//	position && anchor point
 	//	The default is false, but it always be true on WPJLayer because Layer needn't to consider
@@ -235,7 +231,7 @@ public:
 
 	//	Convert node's coordinate system from relative to allegro system
 	//	Usually, it's used for drawing
-	virtual WPJPoint RelativeConvertToAllegro();
+	WPJPoint RelativeConvertToAllegro();
 
 protected:
 	WPJNode();
@@ -261,7 +257,6 @@ protected:
 	WPJ_PROPERTY_BY_REF(WPJPoint, m_obAnchorPoint, AnchorPoint)		// transition center, default (0.5, 0.5)
 	WPJ_PROPERTY_BY_REF(WPJPoint, m_obPosition, Position)			// position
 	WPJ_PROPERTY_BY_REF(WPJRect, m_obRegion, Region)				// region, default (0, 0, 0, 0) - show all
-	WPJ_PROPERTY_BY_REF(WPJSize, m_obContentSize, ContentSize)		// node untransmit size
 	WPJ_PROPERTY(float, m_fAngle, Angle)							// rotate, default 0
 	
 private:

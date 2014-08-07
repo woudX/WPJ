@@ -2,7 +2,6 @@
 #include "WPJGarbageCollection.h"
 #include "WPJActionManager.h"
 #include "WPJDirector.h"
-#include "WPJLib.h"
 
 USING_NS_WPJ
 
@@ -18,7 +17,6 @@ WPJNode::WPJNode()
 	,m_fAngle(0)
 	,m_ucCoordinateSystem(WPJ_COORDINATE_WORLD)
 	,m_obRegion(WPJRectZero)
-	,m_obContentSize(WPJSizeZero)
 	,m_bVisible(true)
 	,m_bIgnoreAnchorPoint(false)
 {
@@ -106,8 +104,7 @@ bool WPJNode::Init()
 
 void WPJNode::SetParent(WPJNode* var)
 {
-	WPJ_SAFE_RELEASE(m_pParent);
-	m_pParent = var;
+	var->GetSharedPtr(m_pParent);
 }
 
 WPJNode *WPJNode::GetParent()
@@ -221,16 +218,7 @@ float WPJNode::GetAngle()
 void WPJNode::SetAngle(float var)
 {
 	m_fAngle = var;	
-}
-
-void WPJNode::SetContentSize(WPJSize var)
-{
-	m_obContentSize = var;
-}
-
-WPJSize &WPJNode::GetContentSize()
-{
-	return m_obContentSize;
+	// (var > 0) ? (fmodf(var, MATH_PI * 2)) : (fmodf(var, MATH_PI * 2) + MATH_PI * 2);
 }
 
 bool WPJNode::IsRunning()
@@ -307,15 +295,12 @@ void WPJNode::AddChild(WPJNode *p_pChild, int p_izOrder, int p_iTag)
 	ASSERT(p_pChild->GetParent() == NULL);
 
 	WPJNode *pSharedChild = NULL;
-	pSharedChild = p_pChild;
-	p_pChild->Retain();
+	p_pChild->GetSharedPtr(pSharedChild);
 
 	pSharedChild->m_iZOrder = p_izOrder;
 	pSharedChild->m_iTag = p_iTag;
-
 	pSharedChild->m_pParent = this;
-	this->Retain();
-
+	
 	m_lChildList.push_back(pSharedChild);
 
 	if (m_bIsRunning)
@@ -440,21 +425,6 @@ void WPJNode::Draw()
 
 }
 
-bool WPJNode::CmpMethod(const WPJNode *a, const WPJNode *b)
-{
-	return a->m_iZOrder < b->m_iZOrder;
-}
-
-bool WPJNode::operator()(const WPJNode *a, const WPJNode *b)
-{
-	return a->m_iZOrder < b->m_iZOrder;
-}
-
-void WPJNode::SortAllChildren()
-{
-	m_lChildList.sort(WPJNode());
-}
-
 void WPJNode::Visit()
 {
 	if (!m_bVisible)
@@ -462,34 +432,6 @@ void WPJNode::Visit()
 
 	if (m_lChildList.size() != 0)
 	{
-		SortAllChildren();
-		std::list<WPJNode *>::iterator itor = m_lChildList.begin();
-
-		while (itor != m_lChildList.end())
-		{
-			if (pp(itor)->m_iZOrder < 0)
-			{
-				pp(itor)->Visit();
-				itor++;
-			}
-			else
-				break;
-		}
-
-		this->Draw();
-
-		while (itor != m_lChildList.end())
-		{
-			if (pp(itor)->m_iZOrder >= 0)
-			{
-				pp(itor)->Visit();
-				itor++;
-			}
-			else
-				break;
-		}
-
-		/*
 		// Visit node which zOrder < 0
 		foreach_in_list_auto(WPJNode*, itor, m_lChildList)
 		{
@@ -505,7 +447,7 @@ void WPJNode::Visit()
 			if ((*itor)->m_iZOrder > 0)
 				(*itor)->Visit();
 		}
-		*/
+		
 	}
 	else
 	{
@@ -622,32 +564,6 @@ WPJPoint WPJNode::RelativeConvertToWorld()
 	return t_obWorldPoint;
 }
 
-WPJPoint WPJNode::RelativeConvertToAllegro()
-{
-	WPJPoint t_obAllegroPoint = WPJPointZero;
-	WPJPoint t_obWorldPoint = RelativeConvertToWorld();
-
-	WPJSize offsetSize = WPJDirector::GetSharedInst()->GetDrawOffset();
-	WPJALGOManager *algo = WPJALGOManager::GetSharedInst();
-	t_obAllegroPoint = t_obWorldPoint;
-
-	// scale to fit screen resolution
-	t_obAllegroPoint.x *= algo->GetScaleX() * algo->GetFrameZoomFactor();
-	t_obAllegroPoint.y *= algo->GetScaleY() * algo->GetFrameZoomFactor();
-
-	// anchorPonint fixup
-	if (!IsIgnoreAnchorPoint())
-	{
-		t_obAllegroPoint.x -= m_obAnchorPoint.x * m_obContentSize.width * algo->GetFrameZoomFactor();
-		t_obAllegroPoint.y -= m_obAnchorPoint.y * m_obContentSize.height * algo->GetFrameZoomFactor();
-	}
-
-	t_obAllegroPoint.x += offsetSize.width * algo->GetFrameZoomFactor();
-	t_obAllegroPoint.y += offsetSize.height * algo->GetFrameZoomFactor();
-
-	return t_obAllegroPoint;
-}
-
 WPJNode::~WPJNode()
 {
 	//	release parent
@@ -656,9 +572,6 @@ WPJNode::~WPJNode()
 	//	release all child
 	foreach_in_list_auto(WPJNode*, itor, m_lChildList)
 	{
-		WPJ_SAFE_RELEASE(pp(itor)->GetParent());
-		pp(itor)->SetParent(NULL);
-
 		WPJ_SAFE_RELEASE(pp(itor));
 	}
 }

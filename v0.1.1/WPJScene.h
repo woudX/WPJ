@@ -46,8 +46,9 @@ class WPJScene : public WPJNode
 {
 public:
 	static WPJScene *CreateNewObject();
+	void GetSharedPtr(WPJScene* &object);
 
-	virtual bool Init();
+	bool Init();
 
 	~WPJScene();
 protected:

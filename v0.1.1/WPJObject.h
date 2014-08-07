@@ -47,7 +47,7 @@ public:
 	//	Get This Object Size
 	virtual U_INT GetSize();
 
-
+	//	
 	virtual void Update(float dt);
 	virtual ~WPJObject();
 };
