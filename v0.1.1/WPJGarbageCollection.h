@@ -4,7 +4,7 @@
 #include "WPJObject.h"
 #include "WPJMacros.h"
 #include "WPJStdafx.h"
-
+#include "WPJLib.h"
 
 /**
  *	Garbage Collection, this class contain garbage collection and autorelease

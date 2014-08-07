@@ -9,11 +9,7 @@
 
 NS_WPJ_BEGIN
 
-class WPJScriptManager;
-class WPJScriptProtocol;
 class WPJActionManager;
-class TimeVal;
-
 /**
  *	Brief, WPJDirector is responsible for scene change¡¢pause¡¢resume, flow control, like a director
  *	So WPJDirector contains these kinds of method:
@@ -77,11 +73,6 @@ public:
 	WPJSize GetViewSize();
 	WPJSize GetDrawOffset();
 
-	/**
-	 *	Script Engine
-	 */
-	WPJScriptProtocol *GetScriptEngine();
-
 protected:
 	WPJDirector();
 
@@ -106,8 +97,6 @@ protected:
 	WPJActionManager *m_pActionManager;
 	WPJ_PROPERTY(WPJScheduler*, m_pScheduler, Scheduler)
 	WPJ_PROPERTY_READONLY(WPJALGOManager*, m_pALGOManager, ALGOManager)
-	WPJ_PROPERTY_READONLY(WPJScriptManager*, m_pScriptManager, ScriptManager)
-
 private:
 	static WPJDirector *m_pInst;
 	

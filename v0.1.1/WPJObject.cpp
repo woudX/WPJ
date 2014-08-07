@@ -1,6 +1,6 @@
 #include "WPJObject.h"
 #include "WPJGarbageCollection.h"
-#include "WPJLib.h"
+
 USING_NS_WPJ;
 
 WPJObject::WPJObject()
