@@ -2,6 +2,7 @@
 #include "WPJAppDelegate.h"
 #include "WPJActionManager.h"
 #include "WPJScriptSupport.h"
+#include "WPJInputUtil.h"
 
 USING_NS_WPJ
 
@@ -192,6 +193,16 @@ void WPJDirector::End()
 void WPJDirector::Draw()
 {
 	CalculateInterval();
+
+	// update events
+	WPJEvent *pNowEvent = WPJInputUtil::GetSharedInst()->NextTriggedEvent();
+
+	while (pNowEvent != NULL)
+	{
+		m_pNextScene->RunEvent(pNowEvent);
+		pNowEvent = WPJInputUtil::GetSharedInst()->NextTriggedEvent();
+	}
+
 
 	// update scheduler
 	m_pScheduler->Update(m_fDeltaTime);

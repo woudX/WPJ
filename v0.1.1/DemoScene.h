@@ -10,6 +10,7 @@ class DemoScene : public WPJScene
 public:
 	DemoScene();
 	static DemoScene *CreateNewObject();
+	void EventRouteTestFunction(WPJEvent *e);
 
 	bool Init();
 };

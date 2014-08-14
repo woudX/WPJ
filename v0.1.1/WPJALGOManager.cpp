@@ -1,5 +1,6 @@
 #include "WPJALGOManager.h"
 #include "WPJLib.h"
+#include "WPJInputUtil.h"
 
 USING_NS_WPJ
 
@@ -50,15 +51,12 @@ bool WPJALGOManager::InitALGO()
 		return false;
 	}
 
+	// Initialize allegro input
+	WPJInputUtil::GetSharedInst()->RegistDisplay(m_pDisplay)->Init();
+
 	// Initialize window params
 	al_set_window_title(m_pDisplay, m_obWndName.c_str());
 	al_clear_to_color(al_map_rgb(0,0,0));
-
-	// Initialize Allegro event queue
-	m_pEventQueue = al_create_event_queue();
-	al_register_event_source(m_pEventQueue, al_get_keyboard_event_source());
-	al_register_event_source(m_pEventQueue, al_get_mouse_event_source());
-	al_register_event_source(m_pEventQueue, al_get_display_event_source(m_pDisplay));
 
 	// Show
 	al_flip_display();

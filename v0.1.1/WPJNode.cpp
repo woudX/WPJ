@@ -488,24 +488,6 @@ void WPJNode::Visit()
 			else
 				break;
 		}
-
-		/*
-		// Visit node which zOrder < 0
-		foreach_in_list_auto(WPJNode*, itor, m_lChildList)
-		{
-			if ((*itor)->m_iZOrder < 0)
-				(*itor)->Visit();
-		}
-
-		this->Draw();
-
-		// Visit node which zOrder > 0
-		foreach_in_list_auto(WPJNode*, itor, m_lChildList)
-		{
-			if ((*itor)->m_iZOrder > 0)
-				(*itor)->Visit();
-		}
-		*/
 	}
 	else
 	{
@@ -572,6 +554,48 @@ void WPJNode::PauseScheduleAndAction()
 void WPJNode::ResumeScheduleAndAction()
 {
 	m_pScheduler->ResumeTarget(this);
+}
+
+void WPJNode::RunEvent(WPJEvent *e)
+{
+	//	There is no need to run becasue event is not bubble and has run
+	if (e->isBubble == false && e->runTimes > 0)
+		return ;
+
+	std::list<WPJNode *>::reverse_iterator itor = m_lChildList.rbegin();
+
+	if (m_lChildList.size() > 0)
+	{
+		SortAllChildren();
+
+		while (itor != m_lChildList.rend())
+		{
+			if (pp(itor)->m_iZOrder > 0)
+			{
+				pp(itor)->RunEvent(e);
+				itor++;
+			}
+			else
+				break;
+		}
+
+		WPJEventRoute::RunEvent(e, this);
+
+		while (itor != m_lChildList.rend())
+		{
+			if (pp(itor)->m_iZOrder < 0)
+			{
+				pp(itor)->RunEvent(e);
+				itor++;
+			}
+			else
+				break;
+		}
+	}
+	else
+	{
+		WPJEventRoute::RunEvent(e, this);
+	}
 }
 
 void WPJNode::RunAction(WPJAction *pAction)

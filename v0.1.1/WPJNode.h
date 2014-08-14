@@ -5,6 +5,7 @@
 #include "WPJObject.h"
 #include "WPJScheduler.h"
 
+#include "WPJEventRoute.h"
 #include "WPJGeometry.h"
 #include "WPJProtocols.h"
 
@@ -12,6 +13,8 @@ NS_WPJ_BEGIN
 
 class WPJAction;
 class WPJActionManager;
+
+
 /**
  *	Brief WPJNode is the core class of all kinds of derived classes, it contains basic draw params and method
 	so that all draw classes is WPJNode.
@@ -21,6 +24,9 @@ class WPJActionManager;
 	2. It can schedule/unschedule callback function
 	3. It contain basic position params (Point, Rotate, etc.)
 	4. It can execute actions
+	
+	from 2014/8/12
+	5. It can regist event handler (Event Route)
 
 	WPJNode can be divide into these parts:
 	- Setters & Getters for Graphic Properties
@@ -31,6 +37,7 @@ class WPJActionManager;
 	- Draw					¡Ì
 	- Transformation			¡Ì
 	- Coordinate Converters	¡Ì
+	- Event Route	
  */
 
 enum WPJ_COORDINATE_SYSTEMS {
@@ -41,7 +48,7 @@ enum WPJ_COORDINATE_SYSTEMS {
 };
 
 
-class WPJNode : public WPJObject
+class WPJNode : public WPJObject, public WPJEventRoute
 {
 public:
 
@@ -207,6 +214,14 @@ public:
 	virtual void Update(float dt);
 	virtual void CleanUp();
 
+	/// Event Route
+	/**
+	 *	Event Route is like RoutedEvent in windows WPF, when some event happend,
+	 *	the draw tree will be egrodiced by iOrder
+	 */
+	//	Run event handler with event
+	void RunEvent(WPJEvent *e);
+
 	/// Action
 	/**
 	 *	Action is controlled by WPJActionManager, there is only package the interface 
@@ -254,6 +269,7 @@ protected:
 	WPJ_PROPERTY(WPJNode*, m_pParent, Parent)                                                                                                                               
 	WPJ_PROPERTY(WPJScheduler*, m_pScheduler, Scheduler)
 	WPJ_PROPERTY(WPJActionManager*, m_pActionManager, ActionManager)
+
 	WPJ_PROPERTY(float, m_fScaleX, ScaleX)
 	WPJ_PROPERTY(float, m_fScaleY, ScaleY)
 	WPJ_PROPERTY(bool, m_bVisible, Visible)

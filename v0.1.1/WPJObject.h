@@ -12,6 +12,7 @@ NS_WPJ_BEGIN
 */
 
 class WPJNode;
+class WPJEvent;
 
 class WPJObject : public WPJCopying
 {
@@ -57,7 +58,9 @@ typedef void (WPJObject::*SEL_CALLFUNC)();
 typedef void (WPJObject::*SEL_CALLFUNCN)(WPJNode*);
 typedef void (WPJObject::*SEL_CALLFUNCND)(WPJNode*, void *);
 typedef void (WPJObject::*SEL_CALLFUNCO)(WPJObject*);
+typedef void (WPJObject::*SEL_EVENTHANDLER)(WPJEvent*);
 
+#define eventhandler_selector(_SELECTOR) (SEL_EVENTHANDLER)(&_SELECTOR)
 #define schedule_selector(_SELECTOR) (SEL_SCHEDULE)(&_SELECTOR)
 #define callfunc_selector(_SELECTOR) (SEL_CALLFUNC)(&_SELECTOR)
 #define callfuncN_selector(_SELECTOR) (SEL_CALLFUNCN)(&_SELECTOR)

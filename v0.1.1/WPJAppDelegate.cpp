@@ -10,6 +10,7 @@
 #include "WPJTextureManager.h"
 #include "WPJScriptSupport.h"
 #include "DemoScene.h"
+#include "WPJInputUtil.h"
 
 USING_NS_WPJ
 
@@ -50,7 +51,6 @@ bool WPJAppDelegate::Initialization()
 	//////////////////////////////////////////////////////////////////////////
 	WPJALGOManager *t_pALGOManager = WPJALGOManager::GetSharedInst();
 	t_pALGOManager->SetDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, wResolutionShowAll);
-
 
 	/// Init Platform
 	//////////////////////////////////////////////////////////////////////////
@@ -112,6 +112,7 @@ int WPJAppDelegate::Run()
 	LARGE_INTEGER t_obLILast;
 	LARGE_INTEGER t_obLINow;
 	ALLEGRO_EVENT e;
+	WPJInputUtil *t_pInputUtil = WPJInputUtil::GetSharedInst();
 
 	QueryPerformanceCounter(&t_obLILast);
 
@@ -123,41 +124,44 @@ int WPJAppDelegate::Run()
 
 	while (1) 
 	{
-		if ( WPJALGOManager::GetSharedInst()->WaitForEvent(e))
+		if (t_pInputUtil->PeekEvent(e))
 		{
-			// Event Handle
+			t_pInputUtil->AnalysisEvent(e);
 			if (e.type == ALLEGRO_EVENT_KEY_DOWN)
-				if (e.keyboard.keycode == ALLEGRO_KEY_BACKSPACE)
+				if (e.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
 				{
-					// Release all
 					Exit();
 					break;
 				}
-				else
-					WPJLOG("[%s] ´Ó¼üÅÌÊäÈë ... %d\n", _D_NOW_TIME__, e.keyboard.keycode);
-		}
-
-		// Calculate if go into mainloop
-		QueryPerformanceCounter(&t_obLINow);
-
-		if (t_obLINow.QuadPart - t_obLILast.QuadPart > m_liAnimationInterval.QuadPart)
-		{
-			t_obLILast.QuadPart = t_obLINow.QuadPart;
-			
-			// Run MainLoop
-			WPJDirector::GetSharedInst()->MainLoop();
-
-			//	release autorelease pool
-			WPJGC::GetSharedInst()->Pop();
-
-			//	garbage collection
-			WPJGC::GetSharedInst()->GC();
 		}
 		else
 		{
-			Sleep(0);
-		}	
+			// Calculate if go into mainloop
+			QueryPerformanceCounter(&t_obLINow);
+
+			if (t_obLINow.QuadPart - t_obLILast.QuadPart > m_liAnimationInterval.QuadPart)
+			{
+				t_obLILast.QuadPart = t_obLINow.QuadPart;
+
+				// Run MainLoop
+				WPJDirector::GetSharedInst()->MainLoop();
+
+				//	release events
+				WPJInputUtil::GetSharedInst()->ClearAllTriggedEvents();
+
+				//	release autorelease pool
+				WPJGC::GetSharedInst()->Pop();
+
+				//	garbage collection
+				WPJGC::GetSharedInst()->GC();
+
+			}
+			else
+				Sleep(0);		
+		}
+		Sleep(0);
 	}
+	
 	return 0;
 }
 
@@ -169,6 +173,7 @@ int WPJAppDelegate::Exit()
 	delete WPJFileUtil::GetSharedInst();
 	delete WPJTextureManager::GetSharedInst();
 	delete WPJALGOManager::GetSharedInst();
+	delete WPJInputUtil::GetSharedInst();
 	delete WPJDirector::GetSharedInst();
 	delete WPJActionManager::GetsharedInst();
 	WPJGC::GetSharedInst()->Finalize();
